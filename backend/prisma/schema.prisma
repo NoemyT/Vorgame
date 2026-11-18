@@ -1,0 +1,11 @@
+// Esquema do banco do Vorgame.
+// As tabelas (models) serão criadas na Etapa 4, a partir das histórias de usuário.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}

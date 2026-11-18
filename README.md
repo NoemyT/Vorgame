@@ -34,7 +34,7 @@ Definida no [ADR-002](docs/2.%20ADR.md).
 | Backend      | Node.js, TypeScript, NestJS (adaptador Express), validação com DTOs e `class-validator`, OpenAPI com `@nestjs/swagger` |
 | Persistência | MySQL (InnoDB), Prisma ORM e Prisma Migrate                                                                            |
 | Frontend     | React, TypeScript, Vite, React Router, CSS, `fetch`                                                                    |
-| Testes       | Jest e Supertest no backend; Vitest e React Testing Library no frontend                                                |
+| Testes       | Vitest e Supertest no backend; Vitest e React Testing Library no frontend                                              |
 
 Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/README.md](frontend/README.md).
 
@@ -44,22 +44,33 @@ Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/REA
 | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | [1. Histórias de Usuário (Alta)](docs/1.%20Hist%C3%B3rias%20de%20Usu%C3%A1rio%20%28Alta%29.md) | HU01 a HU06, recorte do protótipo e critérios de aceitação |
 | [2. ADR](docs/2.%20ADR.md)                                                                     | ADR-001 (arquitetura) e ADR-002 (stack)                    |
-| [3. Diagrama de Contexto](docs/3.%20Diagrama%20de%20Contexto.png)                              | C4 nível 1: usuário, Vorgame e fonte do catálogo           |
+| [3. Diagrama de Contexto](docs/3.%20Diagrama%20de%20Contexto.png)                              | C4 nível 1: usuário e Vorgame, com catálogo local          |
 | [4. Diagrama de Container](docs/4.%20Diagrama%20de%20Container.png)                            | C4 nível 2: aplicação web, backend e banco                 |
 | [5. Diagrama de Componentes](docs/5.%20Diagrama%20de%20Componentes.png)                        | C4 nível 3: módulos do backend                             |
 | [6. Diagrama de Código](docs/6.%20Diagrama%20de%20C%C3%B3digo.png)                             | C4 nível 4: classes Usuário, Jogo, Avaliação e Review      |
 | [7. Contrato da API](docs/7.%20Contrato%20da%20API.md)                                         | Endpoints do protótipo com entrada, saída e erros          |
 
-Os diagramas mostram a arquitetura planejada do produto completo. Para esta entrega vale o recorte acima: reviews adiadas e catálogo local. Os diagramas de container e de componentes ainda trazem o rótulo PostgreSQL; o banco adotado é MySQL, conforme o ADR-001.
-
 ## Estrutura do repositório
 
 ```
 /docs       documentação: histórias, ADRs, diagramas C4 e contrato da API
-/backend    API REST em NestJS (ainda não implementada)
-/frontend   aplicação web em React (ainda não implementada)
+/backend    API REST em NestJS (esqueleto com a rota /health)
+/frontend   aplicação web em React (página de status)
 ```
+
+## Hospedagem
+
+| Parte    | Plataforma                                                                    |
+| -------- | ----------------------------------------------------------------------------- |
+| Banco    | TiDB Cloud (compatível com MySQL), combinado com o professor no lugar do Neon |
+| Backend  | Render                                                                        |
+| Frontend | Vercel                                                                        |
 
 ## Estado atual
 
-A documentação de contexto está completa e a stack está decidida. O código de backend e frontend ainda não foi iniciado.
+Fatia mínima ponta a ponta publicada:
+
+- Frontend: adicionar depois
+- API (rota de saúde): adicionar depois
+
+**Atenção ao primeiro acesso:** o backend no plano gratuito do Render hiberna após cerca de 15 minutos sem uso. O primeiro acesso depois disso levou aproximadamente XX segundos (medido em DD/MM). Os acessos seguintes respondem normalmente.
