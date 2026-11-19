@@ -2,17 +2,17 @@
 
 ## Stack escolhida
 
-| Responsabilidade | Tecnologia |
-| --- | --- |
-| Linguagem | TypeScript |
-| Interface | React |
-| Desenvolvimento e build | Vite, template `react-ts` |
-| Navegação | React Router |
-| Estilos | CSS |
-| Requisições HTTP | API `fetch` do navegador |
-| Ambiente de desenvolvimento | Node.js 22 LTS, com npm |
-| Testes de componentes | Vitest, jsdom e React Testing Library |
-| Linter | oxlint |
+| Responsabilidade            | Tecnologia                            |
+| --------------------------- | ------------------------------------- |
+| Linguagem                   | TypeScript                            |
+| Interface                   | React                                 |
+| Desenvolvimento e build     | Vite, template `react-ts`             |
+| Navegação                   | React Router                          |
+| Estilos                     | CSS                                   |
+| Requisições HTTP            | API `fetch` do navegador              |
+| Ambiente de desenvolvimento | Node.js 22 LTS, com npm               |
+| Testes de componentes       | Vitest, jsdom e React Testing Library |
+| Linter                      | oxlint                                |
 
 React permite organizar as telas em componentes reutilizáveis, e TypeScript explicita os dados trocados com a API. Vite fornece o ambiente de desenvolvimento e o build da aplicação. CSS e `fetch` atendem às necessidades iniciais sem bibliotecas adicionais de estilos ou de requisições.
 
@@ -40,8 +40,8 @@ Os componentes não chamam `fetch` diretamente: usam as funções de `servicos/a
 
 Copie `.env.example` para `.env` e preencha o valor.
 
-| Variável | Uso |
-| --- | --- |
+| Variável            | Uso                                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `VITE_API_BASE_URL` | Endereço da API, sem barra no final. Local: `http://localhost:3000`. Publicado: a URL do serviço no Render. |
 
 ## Como rodar localmente
@@ -52,21 +52,21 @@ npm ci
 npm run dev   # http://localhost:5173
 ```
 
-| Comando | O que faz |
-| --- | --- |
-| `npm test` | Testes de componentes e da camada de serviço |
-| `npm run lint` | Linter (oxlint) |
-| `npm run build` | Gera a versão de produção em `dist/` |
+| Comando         | O que faz                                    |
+| --------------- | -------------------------------------------- |
+| `npm test`      | Testes de componentes e da camada de serviço |
+| `npm run lint`  | Linter (oxlint)                              |
+| `npm run build` | Gera a versão de produção em `dist/`         |
 
 ## Deploy na Vercel
 
-| Campo | Valor |
-| --- | --- |
-| Root Directory | `frontend` |
-| Framework Preset | Vite |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Variável | `VITE_API_BASE_URL` |
+| Campo            | Valor               |
+| ---------------- | ------------------- |
+| Root Directory   | `frontend`          |
+| Framework Preset | Vite                |
+| Build Command    | `npm run build`     |
+| Output Directory | `dist`              |
+| Variável         | `VITE_API_BASE_URL` |
 
 ## Estado atual
 

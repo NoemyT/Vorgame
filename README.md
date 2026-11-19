@@ -70,7 +70,7 @@ Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/REA
 
 Fatia mínima ponta a ponta publicada:
 
-- Frontend: adicionar depois
-- API (rota de saúde): adicionar depois
+- Frontend: https://vorgame.vercel.app
+- API (rota de saúde): https://vorgame-api.onrender.com/health
 
-**Atenção ao primeiro acesso:** o backend no plano gratuito do Render hiberna após cerca de 15 minutos sem uso. O primeiro acesso depois disso levou aproximadamente XX segundos (medido em DD/MM). Os acessos seguintes respondem normalmente.
+**Atenção ao primeiro acesso:** o backend no plano gratuito do Render hiberna após cerca de 15 minutos sem uso. O primeiro acesso depois disso levou aproximadamente 30 segundos (medido em 19/11). Os acessos seguintes respondem normalmente. **Bloqueadores de anúncio** podem barrar as chamadas do site à API. Se a página mostrar "API indisponível", desative o bloqueador para este site e recarregue.

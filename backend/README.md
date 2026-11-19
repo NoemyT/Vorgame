@@ -2,17 +2,17 @@
 
 ## Stack escolhida
 
-| Responsabilidade | Tecnologia |
-| --- | --- |
-| Linguagem | TypeScript |
-| Ambiente de execução | Node.js 22 LTS, com npm |
-| API REST | NestJS 12 com adaptador Express |
-| Validação de entradas | DTOs com `ValidationPipe`, `class-validator` e `class-transformer` |
-| Persistência | Prisma ORM 6 e Prisma Client |
-| Banco de dados | MySQL com tabelas InnoDB, hospedado no TiDB Cloud (compatível com MySQL) |
-| Migrações do banco | Prisma Migrate |
-| Documentação OpenAPI | `@nestjs/swagger` |
-| Testes | Vitest e Supertest |
+| Responsabilidade      | Tecnologia                                                               |
+| --------------------- | ------------------------------------------------------------------------ |
+| Linguagem             | TypeScript                                                               |
+| Ambiente de execução  | Node.js 22 LTS, com npm                                                  |
+| API REST              | NestJS 12 com adaptador Express                                          |
+| Validação de entradas | DTOs com `ValidationPipe`, `class-validator` e `class-transformer`       |
+| Persistência          | Prisma ORM 6 e Prisma Client                                             |
+| Banco de dados        | MySQL com tabelas InnoDB, hospedado no TiDB Cloud (compatível com MySQL) |
+| Migrações do banco    | Prisma Migrate                                                           |
+| Documentação OpenAPI  | `@nestjs/swagger`                                                        |
+| Testes                | Vitest e Supertest                                                       |
 
 NestJS organiza a API em módulos, controllers e providers, alinhados ao monólito modular previsto. TypeScript será usado tanto no backend quanto no frontend. Prisma organiza o acesso tipado ao banco e a evolução do esquema por migrações; `@nestjs/swagger` permitirá documentar e conferir a implementação com o [contrato da API](../docs/7.%20Contrato%20da%20API.md).
 
@@ -39,11 +39,11 @@ test/
 
 Copie `.env.example` para `.env` e preencha os valores. O arquivo `.env` nunca vai para o Git.
 
-| Variável | Uso |
-| --- | --- |
-| `DATABASE_URL` | String de conexão do TiDB Cloud (MySQL), terminando em `?sslaccept=strict` |
-| `PORT` | Porta da API. Local: 3000. No Render, é definida automaticamente. |
-| `CORS_ORIGIN` | Endereços que podem chamar a API, separados por vírgula. Ex.: `http://localhost:5173,https://vorgame.vercel.app` |
+| Variável       | Uso                                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL` | String de conexão do TiDB Cloud (MySQL), terminando em `?sslaccept=strict`                                       |
+| `PORT`         | Porta da API. Local: 3000. No Render, é definida automaticamente.                                                |
+| `CORS_ORIGIN`  | Endereços que podem chamar a API, separados por vírgula. Ex.: `http://localhost:5173,https://vorgame.vercel.app` |
 
 O navegador não acessa o banco diretamente.
 
@@ -55,34 +55,34 @@ npm ci              # instala as dependências e gera o Prisma Client
 npm run start:dev   # API em http://localhost:3000
 ```
 
-| Comando | O que faz |
-| --- | --- |
-| `npm test` | Testes unitários |
-| `npm run test:e2e` | Testes de ponta a ponta (sem banco real) |
-| `npm run lint` | Linter (oxlint) |
-| `npm run build` | Compila para `dist/` |
-| `npm run start:prod` | Roda a versão compilada |
+| Comando              | O que faz                                |
+| -------------------- | ---------------------------------------- |
+| `npm test`           | Testes unitários                         |
+| `npm run test:e2e`   | Testes de ponta a ponta (sem banco real) |
+| `npm run lint`       | Linter (oxlint)                          |
+| `npm run build`      | Compila para `dist/`                     |
+| `npm run start:prod` | Roda a versão compilada                  |
 
 ## Rota de saúde
 
 `GET /health` executa `SELECT 1` no banco.
 
-| Situação | Resposta |
-| --- | --- |
-| API e banco funcionando | `200` com `{ "api": "ok", "banco": "ok" }` |
-| Banco inacessível | `503` com `{ "api": "ok", "banco": "erro" }` |
+| Situação                | Resposta                                     |
+| ----------------------- | -------------------------------------------- |
+| API e banco funcionando | `200` com `{ "api": "ok", "banco": "ok" }`   |
+| Banco inacessível       | `503` com `{ "api": "ok", "banco": "erro" }` |
 
 ## Deploy no Render
 
-| Campo | Valor |
-| --- | --- |
-| Root Directory | `backend` |
-| Build Command | `npm ci && npm run build` |
-| Start Command | `npm run start:prod` |
-| Health Check Path | `/health` |
-| Variáveis | `DATABASE_URL` e `CORS_ORIGIN` |
+| Campo             | Valor                          |
+| ----------------- | ------------------------------ |
+| Root Directory    | `backend`                      |
+| Build Command     | `npm ci && npm run build`      |
+| Start Command     | `npm run start:prod`           |
+| Health Check Path | `/health`                      |
+| Variáveis         | `DATABASE_URL` e `CORS_ORIGIN` |
 
-No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O primeiro acesso depois disso leva em torno de um minuto.
+No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O primeiro acesso depois disso leva em torno de 30 segundos.
 
 ## Estado atual
 
