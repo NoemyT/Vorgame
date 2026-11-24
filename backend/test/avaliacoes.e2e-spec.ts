@@ -27,6 +27,20 @@ const buscarAvaliacao =
       consulta: Prisma.AvaliacaoFindUniqueArgs,
     ) => Promise<typeof avaliacao | null>
   >();
+const bloquearJogo = vi.fn<() => Promise<{ id: number }[]>>();
+const criarAvaliacao = vi.fn<() => Promise<{ id: number }>>();
+const agregarNotas =
+  vi.fn<() => Promise<{ _sum: { nota: number }; _count: { _all: number } }>>();
+const atualizarJogo = vi.fn<() => Promise<{ id: number }>>();
+const transacao = {
+  $queryRaw: bloquearJogo,
+  avaliacao: { create: criarAvaliacao, aggregate: agregarNotas },
+  jogo: { update: atualizarJogo },
+};
+const executarTransacao = vi.fn(
+  (executar: (cliente: typeof transacao) => Promise<unknown>) =>
+    executar(transacao),
+);
 let app: INestApplication<App>;
 let autorizacao: string;
 
@@ -47,6 +61,7 @@ beforeAll(async () => {
     .useValue({
       usuario: { findUnique: vi.fn().mockResolvedValue(solicitante) },
       avaliacao: { findUnique: buscarAvaliacao },
+      $transaction: executarTransacao,
     })
     .compile();
   app = modulo.createNestApplication<INestApplication<App>>();
@@ -57,6 +72,11 @@ beforeAll(async () => {
 
 beforeEach(() => {
   buscarAvaliacao.mockReset();
+  bloquearJogo.mockReset();
+  criarAvaliacao.mockReset();
+  agregarNotas.mockReset();
+  atualizarJogo.mockReset();
+  executarTransacao.mockClear();
 });
 
 afterAll(async () => {
@@ -127,6 +147,120 @@ describe('validação de GET /games/:id/ratings/me', () => {
 
       await chamada.expect(401);
       expect(buscarAvaliacao).not.toHaveBeenCalled();
+    },
+  );
+});
+
+describe('POST /games/:id/ratings', () => {
+  it.each([
+    { nota: 0, soma: 0, total: 1, media: 0 },
+    { nota: 10, soma: 33, total: 4, media: 8.3 },
+  ])(
+    'cria nota $nota e atualiza os agregados na mesma transação',
+    async ({ nota, soma, total, media }) => {
+      bloquearJogo.mockResolvedValue([{ id: 7 }]);
+      criarAvaliacao.mockResolvedValue({ id: 1 });
+      agregarNotas.mockResolvedValue({
+        _sum: { nota: soma },
+        _count: { _all: total },
+      });
+      atualizarJogo.mockResolvedValue({ id: 7 });
+
+      await request(app.getHttpServer())
+        .post('/games/7/ratings')
+        .set('Authorization', autorizacao)
+        .send({ nota, usuarioId: 999 })
+        .expect(201)
+        .expect({
+          jogoId: 7,
+          nota,
+          mediaAvaliacao: media,
+          totalAvaliacoes: total,
+        });
+
+      expect(executarTransacao).toHaveBeenCalledExactlyOnceWith(
+        expect.any(Function),
+        { isolationLevel: 'ReadCommitted' },
+      );
+      expect(criarAvaliacao).toHaveBeenCalledExactlyOnceWith({
+        data: { jogoId: 7, usuarioId: solicitante.id, nota },
+        select: { id: true },
+      });
+      expect(atualizarJogo).toHaveBeenCalledExactlyOnceWith({
+        where: { id: 7 },
+        data: {
+          mediaAvaliacao: new Prisma.Decimal(media),
+          totalAvaliacoes: total,
+        },
+        select: { id: true },
+      });
+    },
+  );
+});
+
+describe('erros de POST /games/:id/ratings', () => {
+  it('retorna 404 se o jogo não existir', async () => {
+    bloquearJogo.mockResolvedValue([]);
+
+    await request(app.getHttpServer())
+      .post('/games/999/ratings')
+      .set('Authorization', autorizacao)
+      .send({ nota: 8 })
+      .expect(404);
+
+    expect(criarAvaliacao).not.toHaveBeenCalled();
+  });
+
+  it('retorna 409 se a avaliação já existir', async () => {
+    bloquearJogo.mockResolvedValue([{ id: 7 }]);
+    criarAvaliacao.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Avaliação duplicada', {
+        code: 'P2002',
+        clientVersion: '6.19.3',
+      }),
+    );
+
+    await request(app.getHttpServer())
+      .post('/games/7/ratings')
+      .set('Authorization', autorizacao)
+      .send({ nota: 8 })
+      .expect(409);
+
+    expect(atualizarJogo).not.toHaveBeenCalled();
+  });
+});
+
+describe('validação de POST /games/:id/ratings', () => {
+  it.each([
+    {},
+    { nota: -1 },
+    { nota: 11 },
+    { nota: 3.5 },
+    { nota: '8' },
+    { nota: null },
+  ])('retorna 400 para corpo inválido %#', async (corpo) => {
+    await request(app.getHttpServer())
+      .post('/games/7/ratings')
+      .set('Authorization', autorizacao)
+      .send(corpo)
+      .expect(400);
+
+    expect(executarTransacao).not.toHaveBeenCalled();
+  });
+
+  it.each(['ausente', 'inválido', 'expirado'])(
+    'retorna 401 para token %s',
+    async (situacao) => {
+      const chamada = request(app.getHttpServer())
+        .post('/games/7/ratings')
+        .send({ nota: 8 });
+      if (situacao === 'inválido')
+        chamada.set('Authorization', 'Bearer invalido');
+      if (situacao === 'expirado')
+        chamada.set('Authorization', await gerarAutorizacao(-1));
+
+      await chamada.expect(401);
+      expect(executarTransacao).not.toHaveBeenCalled();
     },
   );
 });
