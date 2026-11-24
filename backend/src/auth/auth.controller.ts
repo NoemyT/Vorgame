@@ -2,13 +2,17 @@ import {
   Body,
   ConflictException,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   UnauthorizedException,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthGuard, type RequisicaoAutenticada } from './auth.guard.js';
 import { AuthService } from './auth.service.js';
 import { CadastroDto } from './cadastro.dto.js';
 import { LoginDto } from './login.dto.js';
@@ -47,5 +51,11 @@ export class AuthController {
       throw new UnauthorizedException('Credenciais inválidas');
     }
     return sessao;
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  consultarUsuario(@Req() requisicao: RequisicaoAutenticada) {
+    return requisicao.usuarioAutenticado;
   }
 }

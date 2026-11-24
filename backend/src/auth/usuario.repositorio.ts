@@ -9,11 +9,19 @@ interface NovoUsuario {
   senhaHash: string;
 }
 
-const selecaoCadastro = {
+const selecaoPublica = {
   id: true,
   nome: true,
   email: true,
   username: true,
+} as const;
+
+export type UsuarioAutenticado = Prisma.UsuarioGetPayload<{
+  select: typeof selecaoPublica;
+}>;
+
+const selecaoCadastro = {
+  ...selecaoPublica,
   criadoEm: true,
 } as const;
 
@@ -87,6 +95,17 @@ export class UsuarioRepositorio {
       });
     } catch (erro) {
       throw falhaNaPersistencia('Falha ao consultar usuário para login', erro);
+    }
+  }
+
+  async buscarPublicoPorId(id: number): Promise<UsuarioAutenticado | null> {
+    try {
+      return await this.prisma.usuario.findUnique({
+        where: { id },
+        select: selecaoPublica,
+      });
+    } catch (erro) {
+      throw falhaNaPersistencia('Falha ao consultar usuário autenticado', erro);
     }
   }
 }

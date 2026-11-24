@@ -46,4 +46,8 @@ export class AuthService {
     const token = await this.tokens.emitir(id);
     return { token, usuario: { id, nome, username } };
   }
+
+  buscarUsuarioAutenticado(id: number) {
+    return this.usuarios.buscarPublicoPorId(id);
+  }
 }

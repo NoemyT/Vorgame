@@ -103,7 +103,7 @@ No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O pri
 
 ## Estado atual
 
-O esqueleto inclui `/health` com consulta ao banco, CORS configurável e leitura de variáveis de ambiente. A migration inicial cria as tabelas de usuários, jogos e avaliações. O seed carrega o catálogo de jogos. Os módulos de negócio serão implementados a partir da Etapa 5, seguindo o contrato da API.
+O backend inclui `/health`, busca e detalhes de jogos, cadastro, login e consulta da conta autenticada. As rotas de avaliação estão pendentes. A migration inicial cria as tabelas de usuários, jogos e avaliações, e o seed carrega o catálogo.
 
 ## Referências
 

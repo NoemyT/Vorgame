@@ -30,6 +30,7 @@ const usuarioPublico = {
   nome: usuario.nome,
   username: usuario.username,
 };
+const usuarioAutenticado = { ...usuarioPublico, email: usuario.email };
 
 const criarUsuario =
   vi.fn<(consulta: Prisma.UsuarioCreateArgs) => Promise<typeof usuario>>();
@@ -37,7 +38,7 @@ const buscarUsuario =
   vi.fn<
     (
       consulta: Prisma.UsuarioFindUniqueArgs,
-    ) => Promise<typeof usuarioLogin | null>
+    ) => Promise<typeof usuarioLogin | typeof usuarioAutenticado | null>
   >();
 let usuarioLogin: typeof usuarioPublico & { senhaHash: string };
 let app: INestApplication<App>;
@@ -234,4 +235,84 @@ describe('validação de POST /auth/login', () => {
       expect(buscarUsuario).not.toHaveBeenCalled();
     },
   );
+});
+
+function tokenDeTeste(
+  opcoes: { expiresIn?: number; secret?: string; algorithm?: 'HS384' } = {},
+) {
+  return app
+    .get(JwtService)
+    .signAsync(
+      { sub: String(usuario.id) },
+      { secret: SEGREDO_TESTE, ...opcoes },
+    );
+}
+
+describe('GET /auth/me', () => {
+  it('retorna somente os dados públicos com o token emitido no login', async () => {
+    buscarUsuario
+      .mockResolvedValueOnce(usuarioLogin)
+      .mockResolvedValueOnce(usuarioAutenticado);
+
+    const login = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ login: cadastro.email, senha: cadastro.senha })
+      .expect(200);
+    const { token } = login.body as { token: string };
+
+    await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .expect(usuarioAutenticado);
+
+    expect(buscarUsuario).toHaveBeenLastCalledWith({
+      where: { id: usuario.id },
+      select: { id: true, nome: true, email: true, username: true },
+    });
+  });
+
+  it('retorna 401 quando a conta do token não existe mais', async () => {
+    buscarUsuario.mockResolvedValue(null);
+    const token = await tokenDeTeste();
+
+    await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401);
+  });
+});
+
+describe('proteção Bearer de GET /auth/me', () => {
+  it('retorna 401 sem token', async () => {
+    await request(app.getHttpServer()).get('/auth/me').expect(401).expect({
+      statusCode: 401,
+      message: 'Token ausente ou inválido',
+      error: 'Unauthorized',
+    });
+    expect(buscarUsuario).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['expirado', { expiresIn: -1 }],
+    ['assinado com outro segredo', { secret: 'segredo-ficticio-diferente' }],
+    ['com algoritmo diferente de HS256', { algorithm: 'HS384' as const }],
+  ] as const)('retorna 401 para token %s', async (_cenario, opcoes) => {
+    const token = await tokenDeTeste(opcoes);
+
+    await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401);
+
+    expect(buscarUsuario).not.toHaveBeenCalled();
+  });
+
+  it('retorna 401 para um token malformado', async () => {
+    await request(app.getHttpServer())
+      .get('/auth/me')
+      .set('Authorization', 'Bearer invalido')
+      .expect(401);
+    expect(buscarUsuario).not.toHaveBeenCalled();
+  });
 });
