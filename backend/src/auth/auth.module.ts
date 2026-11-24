@@ -15,6 +15,6 @@ import { UsuarioRepositorio } from './usuario.repositorio.js';
   ],
   controllers: [AuthController],
   providers: [AuthGuard, AuthService, TokenService, UsuarioRepositorio],
-  exports: [AuthGuard],
+  exports: [AuthGuard, AuthService],
 })
 export class AuthModule {}

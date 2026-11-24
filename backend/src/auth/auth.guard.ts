@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { AuthService } from './auth.service.js';
-import { TokenService } from './token.service.js';
 import type { UsuarioAutenticado } from './usuario.repositorio.js';
 
 export type RequisicaoAutenticada = Request & {
@@ -15,10 +14,7 @@ export type RequisicaoAutenticada = Request & {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(
-    private readonly auth: AuthService,
-    private readonly tokens: TokenService,
-  ) {}
+  constructor(private readonly auth: AuthService) {}
 
   async canActivate(contexto: ExecutionContext): Promise<boolean> {
     const requisicao = contexto
@@ -31,9 +27,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token ausente ou inválido');
     }
 
-    const id = await this.tokens.identificarUsuario(token);
-    const usuario =
-      id === null ? null : await this.auth.buscarUsuarioAutenticado(id);
+    const usuario = await this.auth.autenticarToken(token);
     if (!usuario) {
       throw new UnauthorizedException('Token ausente ou inválido');
     }
