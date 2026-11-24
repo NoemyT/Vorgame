@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"vite.config.ts\" \"tsconfig*.json\" \"index.html\" \"package.json\"",
     "preview": "vite preview",
     "test": "vitest run"
   },
@@ -25,6 +27,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "jsdom": "^31.0.1",
     "oxlint": "^1.90.0",
+    "prettier": "^3.10.1",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",
     "vitest": "^5.1.1"

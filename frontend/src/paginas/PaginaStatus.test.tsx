@@ -10,7 +10,10 @@ describe('PaginaStatus', () => {
   });
 
   it('mostra "API OK · Banco OK" quando tudo responde', async () => {
-    vi.spyOn(api, 'consultarSaude').mockResolvedValue({ api: 'ok', banco: 'ok' });
+    vi.spyOn(api, 'consultarSaude').mockResolvedValue({
+      api: 'ok',
+      banco: 'ok',
+    });
 
     render(<PaginaStatus />);
 
@@ -18,11 +21,16 @@ describe('PaginaStatus', () => {
   });
 
   it('avisa quando o banco está com erro', async () => {
-    vi.spyOn(api, 'consultarSaude').mockResolvedValue({ api: 'ok', banco: 'erro' });
+    vi.spyOn(api, 'consultarSaude').mockResolvedValue({
+      api: 'ok',
+      banco: 'erro',
+    });
 
     render(<PaginaStatus />);
 
-    expect(await screen.findByText('API OK · Banco com erro')).toBeInTheDocument();
+    expect(
+      await screen.findByText('API OK · Banco com erro'),
+    ).toBeInTheDocument();
   });
 
   it('avisa quando a API está indisponível e permite tentar de novo', async () => {
@@ -34,7 +42,9 @@ describe('PaginaStatus', () => {
     render(<PaginaStatus />);
     expect(await screen.findByText('API indisponível')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Verificar novamente' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Verificar novamente' }),
+    );
 
     expect(await screen.findByText('API OK · Banco OK')).toBeInTheDocument();
     expect(consulta).toHaveBeenCalledTimes(2);
@@ -45,6 +55,8 @@ describe('PaginaStatus', () => {
 
     render(<PaginaStatus />);
 
-    expect(screen.getByText(/primeiro acesso pode levar cerca de um minuto/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/primeiro acesso pode levar cerca de um minuto/),
+    ).toBeInTheDocument();
   });
 });

@@ -55,7 +55,9 @@ npm run dev   # http://localhost:5173
 | Comando         | O que faz                                    |
 | --------------- | -------------------------------------------- |
 | `npm test`      | Testes de componentes e da camada de serviço |
-| `npm run lint`  | Linter (oxlint)                              |
+| `npm run lint`  | Linter (oxlint; ESLint aguarda suporte ao TypeScript 7) |
+| `npm run lint:fix` | Corrige automaticamente o que o Oxlint suporta |
+| `npm run format` | Formata fontes e configurações com Prettier |
 | `npm run build` | Gera a versão de produção em `dist/`         |
 
 ## Deploy na Vercel

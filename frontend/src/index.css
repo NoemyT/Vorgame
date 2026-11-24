@@ -5,7 +5,12 @@
   --ok: #146c2e;
   --erro: #b3261e;
   --destaque: #1f4fbf;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   color: var(--texto);
   background: var(--fundo);
 }

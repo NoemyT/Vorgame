@@ -59,7 +59,9 @@ npm run start:dev   # API em http://localhost:3000
 | -------------------- | ---------------------------------------- |
 | `npm test`           | Testes unitários                         |
 | `npm run test:e2e`   | Testes de ponta a ponta (sem banco real) |
-| `npm run lint`       | Linter (oxlint)                          |
+| `npm run lint`       | ESLint e Oxlint                          |
+| `npm run lint:fix`   | Corrige automaticamente o que os linters suportam |
+| `npm run format`     | Formata fontes e configurações com Prettier |
 | `npm run build`      | Compila para `dist/`                     |
 | `npm run start:prod` | Roda a versão compilada                  |
 

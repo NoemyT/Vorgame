@@ -24,7 +24,9 @@ function obterUrlBase(): string {
 
 function ehStatusSaude(corpo: unknown): corpo is StatusSaude {
   const candidato = corpo as Partial<StatusSaude> | null;
-  return typeof candidato?.api === 'string' && typeof candidato?.banco === 'string';
+  return (
+    typeof candidato?.api === 'string' && typeof candidato?.banco === 'string'
+  );
 }
 
 export async function consultarSaude(): Promise<StatusSaude> {
@@ -35,12 +37,16 @@ export async function consultarSaude(): Promise<StatusSaude> {
     });
   } catch (erro) {
     if (erro instanceof ApiIndisponivelError) throw erro;
-    throw new ApiIndisponivelError(erro instanceof Error ? erro.message : String(erro));
+    throw new ApiIndisponivelError(
+      erro instanceof Error ? erro.message : String(erro),
+    );
   }
 
   const corpo: unknown = await resposta.json().catch(() => null);
   if (!ehStatusSaude(corpo)) {
-    throw new ApiIndisponivelError(`resposta inesperada (HTTP ${resposta.status})`);
+    throw new ApiIndisponivelError(
+      `resposta inesperada (HTTP ${resposta.status})`,
+    );
   }
   return corpo;
 }

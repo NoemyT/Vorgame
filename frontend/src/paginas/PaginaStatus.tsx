@@ -14,8 +14,8 @@ function ResultadoStatus({ estado }: { estado: EstadoConsulta }) {
   if (estado.fase === 'carregando') {
     return (
       <p>
-        Verificando a API… O primeiro acesso pode levar cerca de um minuto, porque o servidor
-        gratuito hiberna quando fica sem uso.
+        Verificando a API… O primeiro acesso pode levar cerca de um minuto,
+        porque o servidor gratuito hiberna quando fica sem uso.
       </p>
     );
   }
@@ -48,7 +48,8 @@ export function PaginaStatus() {
     let ativo = true;
     consultarSaude().then(
       (status) => ativo && setEstado({ fase: 'concluida', status }),
-      (erro: unknown) => ativo && setEstado({ fase: 'falhou', mensagem: descreverErro(erro) }),
+      (erro: unknown) =>
+        ativo && setEstado({ fase: 'falhou', mensagem: descreverErro(erro) }),
     );
     return () => {
       ativo = false;
@@ -67,7 +68,11 @@ export function PaginaStatus() {
       <section aria-live="polite" aria-busy={estado.fase === 'carregando'}>
         <ResultadoStatus estado={estado} />
       </section>
-      <button type="button" onClick={verificarNovamente} disabled={estado.fase === 'carregando'}>
+      <button
+        type="button"
+        onClick={verificarNovamente}
+        disabled={estado.fase === 'carregando'}
+      >
         Verificar novamente
       </button>
     </main>
