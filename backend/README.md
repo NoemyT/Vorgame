@@ -30,7 +30,9 @@ src/
   database/             persistência: PrismaService (acesso ao banco)
   health/               rota GET /health
 prisma/
-  schema.prisma         esquema do banco (tabelas a partir da Etapa 4)
+  schema.prisma         esquema de usuários, jogos e avaliações
+  migrations/           migrations SQL versionadas
+  seed.mjs              carga inicial do catálogo
 test/
   health.e2e-spec.ts    testes de ponta a ponta da rota /health
 ```
@@ -65,6 +67,18 @@ npm run start:dev   # API em http://localhost:3000
 | `npm run build`      | Compila para `dist/`                     |
 | `npm run start:prod` | Roda a versão compilada                  |
 
+## Banco de dados
+
+Com `DATABASE_URL` apontando para o banco-alvo, rode os comandos abaixo a partir de `backend/`. Para validar a instalação do zero, use um banco vazio e isolado.
+
+```bash
+npx prisma migrate status
+npx prisma migrate deploy
+npx prisma db seed
+```
+
+O seed pode ser reaplicado. Ele atualiza os dados dos quatro jogos pela `chaveSeed` e preserva as avaliações, a média e o total. Consulte o [modelo de dados e seed](../docs/8.%20Modelo%20de%20Dados%20e%20Seed.md).
+
 ## Rota de saúde
 
 `GET /health` executa `SELECT 1` no banco.
@@ -88,7 +102,7 @@ No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O pri
 
 ## Estado atual
 
-Esqueleto da Etapa 2 implementado: rota `/health` com consulta ao banco, CORS configurável e leitura de variáveis de ambiente. Os módulos de negócio serão implementados a partir da Etapa 5, seguindo o contrato da API.
+O esqueleto inclui `/health` com consulta ao banco, CORS configurável e leitura de variáveis de ambiente. A migration inicial cria as tabelas de usuários, jogos e avaliações. O seed carrega o catálogo de jogos. Os módulos de negócio serão implementados a partir da Etapa 5, seguindo o contrato da API.
 
 ## Referências
 
