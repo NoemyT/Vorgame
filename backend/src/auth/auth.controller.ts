@@ -2,12 +2,16 @@ import {
   Body,
   ConflictException,
   Controller,
+  HttpCode,
+  HttpStatus,
   Post,
+  UnauthorizedException,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { CadastroDto } from './cadastro.dto.js';
+import { LoginDto } from './login.dto.js';
 
 const mensagensConflito = {
   email: 'Email já cadastrado',
@@ -33,5 +37,15 @@ export class AuthController {
       throw new ConflictException(mensagensConflito[resultado.campo]);
     }
     return resultado.usuario;
+  }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() credenciais: LoginDto) {
+    const sessao = await this.authService.autenticar(credenciais);
+    if (!sessao) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+    return sessao;
   }
 }

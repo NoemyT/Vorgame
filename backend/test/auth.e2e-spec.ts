@@ -1,7 +1,8 @@
 import { INestApplication } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import { Prisma } from '@prisma/client';
-import { compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
@@ -23,14 +24,33 @@ const usuario = {
   criadoEm: new Date('2026-11-18T12:00:00Z'),
 };
 
+const SEGREDO_TESTE = 'segredo-ficticio-da-suite-de-autenticacao';
+const usuarioPublico = {
+  id: usuario.id,
+  nome: usuario.nome,
+  username: usuario.username,
+};
+
 const criarUsuario =
   vi.fn<(consulta: Prisma.UsuarioCreateArgs) => Promise<typeof usuario>>();
+const buscarUsuario =
+  vi.fn<
+    (
+      consulta: Prisma.UsuarioFindUniqueArgs,
+    ) => Promise<typeof usuarioLogin | null>
+  >();
+let usuarioLogin: typeof usuarioPublico & { senhaHash: string };
 let app: INestApplication<App>;
 
 beforeAll(async () => {
+  vi.stubEnv('JWT_SECRET', SEGREDO_TESTE);
+  usuarioLogin = {
+    ...usuarioPublico,
+    senhaHash: await hash(cadastro.senha, 12),
+  };
   const modulo = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(PrismaService)
-    .useValue({ usuario: { create: criarUsuario } })
+    .useValue({ usuario: { create: criarUsuario, findUnique: buscarUsuario } })
     .compile();
   app = modulo.createNestApplication<INestApplication<App>>();
   configurarApp(app);
@@ -39,10 +59,12 @@ beforeAll(async () => {
 
 beforeEach(() => {
   criarUsuario.mockReset();
+  buscarUsuario.mockReset();
 });
 
 afterAll(async () => {
   await app.close();
+  vi.unstubAllEnvs();
 });
 
 function erroUnicidade(target: string) {
@@ -131,4 +153,85 @@ describe('validação de POST /auth/register', () => {
 
     expect(criarUsuario).not.toHaveBeenCalled();
   });
+});
+
+describe('POST /auth/login', () => {
+  it('prioriza o email, emite JWT HS256 de uma hora e retorna o usuário público', async () => {
+    buscarUsuario
+      .mockResolvedValueOnce(usuarioLogin)
+      .mockResolvedValueOnce({ ...usuarioLogin, id: 8 });
+
+    const resposta = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ login: cadastro.email, senha: cadastro.senha })
+      .expect(200);
+
+    const corpo = resposta.body as { token: string; usuario: unknown };
+    expect(corpo).toEqual({
+      token: expect.any(String),
+      usuario: usuarioPublico,
+    });
+    const claims = await app.get(JwtService).verifyAsync<{
+      sub: string;
+      iat: number;
+      exp: number;
+    }>(corpo.token, { secret: SEGREDO_TESTE, algorithms: ['HS256'] });
+    expect(claims.sub).toBe(String(usuario.id));
+    expect(claims.exp - claims.iat).toBe(3600);
+    expect(buscarUsuario).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ where: { email: cadastro.email } }),
+    );
+  });
+
+  it('aceita o username quando o identificador não corresponde a um email', async () => {
+    buscarUsuario
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(usuarioLogin);
+
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ login: cadastro.username, senha: cadastro.senha })
+      .expect(200);
+
+    expect(buscarUsuario).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ where: { username: cadastro.username } }),
+    );
+  });
+});
+
+describe('validação de POST /auth/login', () => {
+  it.each([false, true])(
+    'responde com o mesmo 401 independentemente de a conta existir (%s)',
+    async (contaExiste) => {
+      buscarUsuario.mockResolvedValue(contaExiste ? usuarioLogin : null);
+
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ login: cadastro.email, senha: 'Outra senha fictícia' })
+        .expect(401)
+        .expect({
+          statusCode: 401,
+          message: 'Credenciais inválidas',
+          error: 'Unauthorized',
+        });
+    },
+  );
+
+  it.each([
+    { senha: cadastro.senha },
+    { login: ' ', senha: cadastro.senha },
+    { login: cadastro.email },
+    { login: cadastro.email, senha: ' ' },
+    { login: cadastro.email, senha: cadastro.senha + 'x' },
+  ])(
+    'retorna 400 sem consultar o banco para entrada inválida %#',
+    async (dados) => {
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send(dados)
+        .expect(400);
+      expect(buscarUsuario).not.toHaveBeenCalled();
+    },
+  );
 });

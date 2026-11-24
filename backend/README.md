@@ -46,6 +46,7 @@ Copie `.env.example` para `.env` e preencha os valores. O arquivo `.env` nunca v
 | `DATABASE_URL` | String de conexão do TiDB Cloud (MySQL), terminando em `?sslaccept=strict`                                       |
 | `PORT`         | Porta da API. Local: 3000. No Render, é definida automaticamente.                                                |
 | `CORS_ORIGIN`  | Endereços que podem chamar a API, separados por vírgula. Ex.: `http://localhost:5173,https://vorgame.vercel.app` |
+| `JWT_SECRET`   | Segredo aleatório de alta entropia para o JWT HS256. Os tokens expiram em uma hora. |
 
 O navegador não acessa o banco diretamente.
 
@@ -96,7 +97,7 @@ O seed pode ser reaplicado. Ele atualiza os dados dos quatro jogos pela `chaveSe
 | Build Command     | `npm ci && npm run build`      |
 | Start Command     | `npm run start:prod`           |
 | Health Check Path | `/health`                      |
-| Variáveis         | `DATABASE_URL` e `CORS_ORIGIN` |
+| Variáveis         | `DATABASE_URL`, `CORS_ORIGIN` e `JWT_SECRET` |
 
 No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O primeiro acesso depois disso leva em torno de 30 segundos.
 

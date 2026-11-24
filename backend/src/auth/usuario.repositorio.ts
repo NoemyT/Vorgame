@@ -17,6 +17,13 @@ const selecaoCadastro = {
   criadoEm: true,
 } as const;
 
+const selecaoLogin = {
+  id: true,
+  nome: true,
+  username: true,
+  senhaHash: true,
+} as const;
+
 type ResultadoCadastro =
   | {
       tipo: 'criado';
@@ -33,13 +40,13 @@ function campoDuplicado(alvo: unknown): 'email' | 'username' | 'desconhecido' {
   return 'desconhecido';
 }
 
-function falhaAoGravarUsuario(erro: unknown): Error {
+function falhaNaPersistencia(mensagem: string, erro: unknown): Error {
   // A mensagem original do Prisma pode carregar os dados enviados ao banco.
   const codigo =
     erro instanceof Prisma.PrismaClientKnownRequestError
       ? erro.code
       : undefined;
-  return new Error('Falha ao gravar usuário', { cause: codigo });
+  return new Error(mensagem, { cause: codigo });
 }
 
 @Injectable()
@@ -60,7 +67,26 @@ export class UsuarioRepositorio {
       ) {
         return { tipo: 'conflito', campo: campoDuplicado(erro.meta?.target) };
       }
-      throw falhaAoGravarUsuario(erro);
+      throw falhaNaPersistencia('Falha ao gravar usuário', erro);
+    }
+  }
+
+  async buscarParaLogin(login: string) {
+    try {
+      const usuarioPorEmail = await this.prisma.usuario.findUnique({
+        where: { email: login },
+        select: selecaoLogin,
+      });
+      if (usuarioPorEmail) {
+        return usuarioPorEmail;
+      }
+
+      return await this.prisma.usuario.findUnique({
+        where: { username: login },
+        select: selecaoLogin,
+      });
+    } catch (erro) {
+      throw falhaNaPersistencia('Falha ao consultar usuário para login', erro);
     }
   }
 }
