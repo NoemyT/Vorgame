@@ -15,10 +15,10 @@ export interface AvaliacaoGravada {
   totalAvaliacoes: number;
 }
 
-type ResultadoCriacao =
-  | { tipo: 'gravada'; avaliacao: AvaliacaoGravada }
-  | { tipo: 'jogo-inexistente' }
-  | { tipo: 'duplicada' };
+type ResultadoGravacao =
+  { tipo: 'gravada'; avaliacao: AvaliacaoGravada } | { tipo: 'inexistente' };
+
+type ResultadoCriacao = ResultadoGravacao | { tipo: 'duplicada' };
 
 function idArmazenavel(id: number): boolean {
   return id >= -2_147_483_648 && id <= 2_147_483_647;
@@ -64,30 +64,9 @@ export class AvaliacoesRepositorio {
   }
 
   async criar(dados: DadosAvaliacao): Promise<ResultadoCriacao> {
-    if (!idArmazenavel(dados.jogoId)) {
-      return { tipo: 'jogo-inexistente' };
-    }
-
     try {
-      return await this.prisma.$transaction(
-        async (transacao) => {
-          const { jogoId, nota } = dados;
-          // O bloqueio por jogo serializa as escritas que recalculam seus agregados.
-          const jogos = await transacao.$queryRaw<
-            { id: number }[]
-          >`SELECT id FROM Jogo WHERE id = ${jogoId} FOR UPDATE`;
-          if (jogos.length === 0) {
-            return { tipo: 'jogo-inexistente' };
-          }
-
-          await transacao.avaliacao.create({
-            data: dados,
-            select: { id: true },
-          });
-          const agregados = await atualizarAgregados(transacao, jogoId);
-          return { tipo: 'gravada', avaliacao: { jogoId, nota, ...agregados } };
-        },
-        { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+      return await this.gravar(dados, (transacao) =>
+        transacao.avaliacao.create({ data: dados, select: { id: true } }),
       );
     } catch (erro) {
       if (
@@ -98,5 +77,52 @@ export class AvaliacoesRepositorio {
       }
       throw erro;
     }
+  }
+
+  async alterarPropria(dados: DadosAvaliacao): Promise<ResultadoGravacao> {
+    const { jogoId, usuarioId, nota } = dados;
+    try {
+      return await this.gravar(dados, (transacao) =>
+        transacao.avaliacao.update({
+          where: { usuarioId_jogoId: { jogoId, usuarioId } },
+          data: { nota },
+          select: { id: true },
+        }),
+      );
+    } catch (erro) {
+      if (
+        erro instanceof Prisma.PrismaClientKnownRequestError &&
+        erro.code === 'P2025'
+      ) {
+        return { tipo: 'inexistente' };
+      }
+      throw erro;
+    }
+  }
+
+  private async gravar(
+    { jogoId, nota }: DadosAvaliacao,
+    salvarNota: (transacao: Prisma.TransactionClient) => Promise<unknown>,
+  ): Promise<ResultadoGravacao> {
+    if (!idArmazenavel(jogoId)) {
+      return { tipo: 'inexistente' };
+    }
+
+    return this.prisma.$transaction(
+      async (transacao) => {
+        // O bloqueio serializa escritas no mesmo jogo. ReadCommitted lê as notas já confirmadas após o bloqueio.
+        const jogos = await transacao.$queryRaw<
+          { id: number }[]
+        >`SELECT id FROM Jogo WHERE id = ${jogoId} FOR UPDATE`;
+        if (jogos.length === 0) {
+          return { tipo: 'inexistente' };
+        }
+
+        await salvarNota(transacao);
+        const agregados = await atualizarAgregados(transacao, jogoId);
+        return { tipo: 'gravada', avaliacao: { jogoId, nota, ...agregados } };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+    );
   }
 }

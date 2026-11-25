@@ -29,12 +29,18 @@ const buscarAvaliacao =
   >();
 const bloquearJogo = vi.fn<() => Promise<{ id: number }[]>>();
 const criarAvaliacao = vi.fn<() => Promise<{ id: number }>>();
+const alterarAvaliacao =
+  vi.fn<(consulta: Prisma.AvaliacaoUpdateArgs) => Promise<{ id: number }>>();
 const agregarNotas =
   vi.fn<() => Promise<{ _sum: { nota: number }; _count: { _all: number } }>>();
 const atualizarJogo = vi.fn<() => Promise<{ id: number }>>();
 const transacao = {
   $queryRaw: bloquearJogo,
-  avaliacao: { create: criarAvaliacao, aggregate: agregarNotas },
+  avaliacao: {
+    create: criarAvaliacao,
+    update: alterarAvaliacao,
+    aggregate: agregarNotas,
+  },
   jogo: { update: atualizarJogo },
 };
 const executarTransacao = vi.fn(
@@ -74,6 +80,7 @@ beforeEach(() => {
   buscarAvaliacao.mockReset();
   bloquearJogo.mockReset();
   criarAvaliacao.mockReset();
+  alterarAvaliacao.mockReset();
   agregarNotas.mockReset();
   atualizarJogo.mockReset();
   executarTransacao.mockClear();
@@ -230,7 +237,67 @@ describe('erros de POST /games/:id/ratings', () => {
   });
 });
 
-describe('validação de POST /games/:id/ratings', () => {
+describe('PUT /games/:id/ratings/me', () => {
+  it('atualiza apenas a nota própria e devolve o mesmo total com nova média', async () => {
+    bloquearJogo.mockResolvedValue([{ id: 7 }]);
+    alterarAvaliacao.mockResolvedValue({ id: 1 });
+    agregarNotas.mockResolvedValue({ _sum: { nota: 19 }, _count: { _all: 2 } });
+    atualizarJogo.mockResolvedValue({ id: 7 });
+
+    await request(app.getHttpServer())
+      .put('/games/7/ratings/me')
+      .set('Authorization', autorizacao)
+      .send({ nota: 10, usuarioId: 999 })
+      .expect(200)
+      .expect({ jogoId: 7, nota: 10, mediaAvaliacao: 9.5, totalAvaliacoes: 2 });
+
+    expect(alterarAvaliacao).toHaveBeenCalledExactlyOnceWith({
+      where: { usuarioId_jogoId: { jogoId: 7, usuarioId: solicitante.id } },
+      data: { nota: 10 },
+      select: { id: true },
+    });
+    expect(criarAvaliacao).not.toHaveBeenCalled();
+  });
+
+  it('retorna 404 se o jogo não existir', async () => {
+    bloquearJogo.mockResolvedValue([]);
+
+    await request(app.getHttpServer())
+      .put('/games/999/ratings/me')
+      .set('Authorization', autorizacao)
+      .send({ nota: 8 })
+      .expect(404);
+
+    expect(alterarAvaliacao).not.toHaveBeenCalled();
+  });
+
+  it('retorna 404 quando só existe avaliação de outra conta', async () => {
+    bloquearJogo.mockResolvedValue([{ id: 7 }]);
+    alterarAvaliacao.mockImplementation(({ where }) => {
+      if (where.usuarioId_jogoId?.usuarioId === 2)
+        return Promise.resolve({ id: 2 });
+      return Promise.reject(
+        new Prisma.PrismaClientKnownRequestError('Avaliação ausente', {
+          code: 'P2025',
+          clientVersion: '6.19.3',
+        }),
+      );
+    });
+
+    await request(app.getHttpServer())
+      .put('/games/7/ratings/me')
+      .set('Authorization', autorizacao)
+      .send({ nota: 8 })
+      .expect(404);
+
+    expect(atualizarJogo).not.toHaveBeenCalled();
+  });
+});
+
+describe.each([
+  { metodo: 'post', rota: '/games/7/ratings' },
+  { metodo: 'put', rota: '/games/7/ratings/me' },
+] as const)('validação de $metodo $rota', ({ metodo, rota }) => {
   it.each([
     {},
     { nota: -1 },
@@ -240,7 +307,7 @@ describe('validação de POST /games/:id/ratings', () => {
     { nota: null },
   ])('retorna 400 para corpo inválido %#', async (corpo) => {
     await request(app.getHttpServer())
-      .post('/games/7/ratings')
+      [metodo](rota)
       .set('Authorization', autorizacao)
       .send(corpo)
       .expect(400);
@@ -252,7 +319,7 @@ describe('validação de POST /games/:id/ratings', () => {
     'retorna 401 para token %s',
     async (situacao) => {
       const chamada = request(app.getHttpServer())
-        .post('/games/7/ratings')
+        [metodo](rota)
         .send({ nota: 8 });
       if (situacao === 'inválido')
         chamada.set('Authorization', 'Bearer invalido');

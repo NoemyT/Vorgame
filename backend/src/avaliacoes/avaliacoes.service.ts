@@ -15,4 +15,8 @@ export class AvaliacoesService {
   criar(dados: DadosAvaliacao) {
     return this.repositorio.criar(dados);
   }
+
+  alterarPropria(dados: DadosAvaliacao) {
+    return this.repositorio.alterarPropria(dados);
+  }
 }

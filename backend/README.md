@@ -103,7 +103,7 @@ No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O pri
 
 ## Estado atual
 
-O backend inclui `/health`, busca e detalhes de jogos, cadastro, login e consulta da conta autenticada. As rotas de avaliação estão pendentes. A migration inicial cria as tabelas de usuários, jogos e avaliações, e o seed carrega o catálogo.
+O backend inclui `/health`, busca e detalhes de jogos, cadastro, login, consulta da conta autenticada e as três rotas de avaliação. A migration inicial cria as tabelas de usuários, jogos e avaliações, e o seed carrega o catálogo.
 
 ## Referências
 

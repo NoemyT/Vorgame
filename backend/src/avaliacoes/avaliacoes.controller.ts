@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -45,11 +46,28 @@ export class AvaliacoesController {
       usuarioId: requisicao.usuarioAutenticado.id,
       nota: corpo.nota,
     });
-    if (resultado.tipo === 'jogo-inexistente') {
+    if (resultado.tipo === 'inexistente') {
       throw new NotFoundException('Jogo não encontrado');
     }
     if (resultado.tipo === 'duplicada') {
       throw new ConflictException('Você já avaliou este jogo');
+    }
+    return resultado.avaliacao;
+  }
+
+  @Put('me')
+  async alterarPropria(
+    @Param('id', ParseIntPipe) jogoId: number,
+    @Body(NotaPipe) corpo: NotaDto,
+    @Req() requisicao: RequisicaoAutenticada,
+  ) {
+    const resultado = await this.avaliacoes.alterarPropria({
+      jogoId,
+      usuarioId: requisicao.usuarioAutenticado.id,
+      nota: corpo.nota,
+    });
+    if (resultado.tipo === 'inexistente') {
+      throw new NotFoundException('Jogo ou avaliação não encontrado');
     }
     return resultado.avaliacao;
   }
