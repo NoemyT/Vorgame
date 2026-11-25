@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { configurarOpenApi } from './openapi/configurar-openapi.js';
 
 function lerOrigensPermitidas(valor: string | undefined): string[] {
   return (valor ?? '')
@@ -14,4 +15,5 @@ export function configurarApp(app: INestApplication): void {
     origin: lerOrigensPermitidas(config.get<string>('CORS_ORIGIN')),
   });
   app.enableShutdownHooks();
+  configurarOpenApi(app);
 }

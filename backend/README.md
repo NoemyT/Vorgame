@@ -89,6 +89,13 @@ O seed pode ser reaplicado. Ele atualiza os dados dos quatro jogos pela `chaveSe
 | API e banco funcionando | `200` com `{ "api": "ok", "banco": "ok" }`   |
 | Banco inacessível       | `503` com `{ "api": "ok", "banco": "erro" }` |
 
+## Documentação OpenAPI
+
+- [Swagger UI](http://localhost:3000/docs)
+- [Especificação JSON](http://localhost:3000/docs-json)
+
+A documentação cobre as rotas de HU01 a HU05 e a rota de saúde. Na interface, use **Authorize** com o token retornado por `POST /auth/login` para testar as rotas protegidas.
+
 ## Deploy no Render
 
 | Campo             | Valor                          |
