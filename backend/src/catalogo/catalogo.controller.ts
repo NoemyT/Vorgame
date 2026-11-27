@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   PipeTransform,
   Query,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -23,6 +24,27 @@ import {
   JogoDetalhadoResposta,
 } from '../openapi/respostas.js';
 import { CatalogoService } from './catalogo.service.js';
+
+const MENSAGEM_BUSCA_INDISPONIVEL =
+  'A pesquisa de jogos está temporariamente indisponível';
+
+const exemplosBusca = {
+  comJogos: {
+    summary: 'Busca com resultados',
+    value: {
+      resultados: [
+        {
+          id: 7,
+          titulo: 'Ecos de Órbita',
+          capa: 'https://example.test/capas/ecos-de-orbita.webp',
+          mediaAvaliacao: null,
+          totalAvaliacoes: 0,
+        },
+      ],
+    },
+  },
+  semJogos: { summary: 'Busca sem resultados', value: { resultados: [] } },
+};
 
 @Injectable()
 class TermoBuscaPipe implements PipeTransform<unknown, string> {
@@ -40,7 +62,7 @@ export class CatalogoController {
   constructor(private readonly catalogoService: CatalogoService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Pesquisar jogos por título' })
+  @ApiOperation({ summary: 'Pesquisar jogos na IGDB por título' })
   @ApiQuery({
     name: 'q',
     required: true,
@@ -52,24 +74,8 @@ export class CatalogoController {
   @ApiOkResponse({
     type: BuscaJogosResposta,
     description:
-      'Jogos encontrados. A lista fica vazia quando nenhum título corresponde ao termo.',
-    examples: {
-      comJogos: {
-        summary: 'Busca com resultados',
-        value: {
-          resultados: [
-            {
-              id: 7,
-              titulo: 'Ecos de Órbita',
-              capa: 'https://example.test/capas/ecos-de-orbita.webp',
-              mediaAvaliacao: null,
-              totalAvaliacoes: 0,
-            },
-          ],
-        },
-      },
-      semJogos: { summary: 'Busca sem resultados', value: { resultados: [] } },
-    },
+      'Jogos encontrados na IGDB com IDs locais. Uma busca sem correspondências devolve uma lista vazia.',
+    examples: exemplosBusca,
   })
   @ApiResponse(
     erroHttp(
@@ -78,9 +84,19 @@ export class CatalogoController {
       'q deve conter um termo de busca',
     ),
   )
+  @ApiResponse(
+    erroHttp(
+      503,
+      'Fonte externa de jogos indisponível.',
+      MENSAGEM_BUSCA_INDISPONIVEL,
+    ),
+  )
   async buscar(@Query('q', TermoBuscaPipe) termo: string) {
-    const resultados = await this.catalogoService.buscarPorTitulo(termo);
-    return { resultados };
+    const resultado = await this.catalogoService.buscarPorTitulo(termo);
+    if (resultado.tipo === 'indisponivel') {
+      throw new ServiceUnavailableException(MENSAGEM_BUSCA_INDISPONIVEL);
+    }
+    return { resultados: resultado.resultados };
   }
 
   @Get(':id')
@@ -89,7 +105,7 @@ export class CatalogoController {
     name: 'id',
     schema: { type: 'integer' },
     example: 7,
-    description: 'Identificador do jogo.',
+    description: 'Identificador local do jogo no Vorgame.',
   })
   @ApiOkResponse({
     type: JogoDetalhadoResposta,

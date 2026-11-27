@@ -11,7 +11,7 @@ const operacoes = [
   ['/auth/register', 'post', ['201', '400', '409'], false],
   ['/auth/login', 'post', ['200', '400', '401'], false],
   ['/auth/me', 'get', ['200', '401'], true],
-  ['/games', 'get', ['200', '400'], false],
+  ['/games', 'get', ['200', '400', '503'], false],
   ['/games/{id}', 'get', ['200', '400', '404'], false],
   ['/games/{id}/ratings/me', 'get', ['200', '400', '401', '404'], true],
   ['/games/{id}/ratings', 'post', ['201', '400', '401', '404', '409'], true],
@@ -186,6 +186,15 @@ describe('Esquemas e exemplos OpenAPI', () => {
       message: 'Token ausente ou inválido',
       error: 'Unauthorized',
     });
+  });
+});
+
+it('documenta o erro 503 da busca com o formato padrão', () => {
+  const indisponibilidade = conteudoResposta(operacao('/games', 'get'), '503');
+  expect(indisponibilidade?.example).toEqual({
+    statusCode: 503,
+    message: 'A pesquisa de jogos está temporariamente indisponível',
+    error: 'Service Unavailable',
   });
 });
 

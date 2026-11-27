@@ -18,6 +18,7 @@ const rotulosHttp = {
   401: 'Unauthorized',
   404: 'Not Found',
   409: 'Conflict',
+  503: 'Service Unavailable',
 };
 
 export function erroHttp(
@@ -89,7 +90,8 @@ class JogoResumoResposta {
   titulo!: string;
 
   @ApiProperty({
-    format: 'uri',
+    description:
+      'URL da capa ou texto vazio quando a capa não está disponível.',
     example: 'https://example.test/capas/ecos-de-orbita.webp',
   })
   capa!: string;

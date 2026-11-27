@@ -4,6 +4,9 @@ import { Prisma } from '@prisma/client';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
+import { IgdbAdaptador } from '../src/catalogo/igdb/igdb.adaptador.js';
+import { ErroIgdb } from '../src/catalogo/igdb/igdb.http.js';
+import type { JogoIgdb } from '../src/catalogo/igdb/igdb.resposta.js';
 import { configurarApp } from '../src/configurar-app.js';
 import { PrismaService } from '../src/database/prisma.service.js';
 
@@ -31,14 +34,26 @@ const detalhes = {
 };
 
 type JogoDetalhadoNoBanco = (typeof jogos)[number] & typeof detalhes;
-const findMany = vi.fn<() => Promise<typeof jogos>>();
+const jogoIgdb: JogoIgdb = {
+  idExterno: 1234,
+  titulo: jogos[0].titulo,
+  capa: jogos[0].capa,
+  descricao: detalhes.descricao,
+  generos: ['Aventura', 'Estratégia'],
+  plataformas: detalhes.plataformas,
+};
+const buscarIgdb = vi.fn<IgdbAdaptador['buscarPorTitulo']>();
+const upsert = vi.fn<() => Promise<(typeof jogos)[number]>>();
+const update = vi.fn<() => Promise<(typeof jogos)[number]>>();
 const findUnique = vi.fn<() => Promise<JogoDetalhadoNoBanco | null>>();
 let app: INestApplication<App>;
 
 beforeAll(async () => {
   const modulo = await Test.createTestingModule({ imports: [AppModule] })
+    .overrideProvider(IgdbAdaptador)
+    .useValue({ buscarPorTitulo: buscarIgdb })
     .overrideProvider(PrismaService)
-    .useValue({ jogo: { findMany, findUnique } })
+    .useValue({ jogo: { upsert, update, findUnique } })
     .compile();
   app = modulo.createNestApplication<INestApplication<App>>();
   configurarApp(app);
@@ -46,7 +61,9 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  findMany.mockReset();
+  buscarIgdb.mockReset();
+  upsert.mockReset();
+  update.mockReset();
   findUnique.mockReset();
 });
 
@@ -54,57 +71,146 @@ afterAll(async () => {
   await app.close();
 });
 
-describe('GET /games', () => {
-  it('busca parte do título e devolve o resumo sem exigir autenticação', async () => {
-    findMany.mockResolvedValue(jogos);
+it('devolve apenas resumos da IGDB por título, com o ID e a média locais', async () => {
+  buscarIgdb.mockResolvedValue([
+    jogoIgdb,
+    { ...jogoIgdb, idExterno: 1235, titulo: 'Jardim de Brasa' },
+    jogoIgdb,
+  ]);
+  upsert.mockResolvedValue(jogos[0]);
 
-    await request(app.getHttpServer())
-      .get('/games')
-      .query({ q: '  COS  ' })
-      .expect(200)
-      .expect({ resultados: [{ ...jogos[0], mediaAvaliacao: 9.4 }, jogos[1]] });
+  await request(app.getHttpServer())
+    .get('/games')
+    .query({ q: '  COS  ' })
+    .expect(200)
+    .expect({ resultados: [{ ...jogos[0], mediaAvaliacao: 9.4 }] });
 
-    expect(findMany).toHaveBeenCalledExactlyOnceWith({
-      where: { titulo: { contains: 'COS' } },
-      select: {
-        id: true,
-        titulo: true,
-        capa: true,
-        mediaAvaliacao: true,
-        totalAvaliacoes: true,
+  expect(buscarIgdb).toHaveBeenCalledExactlyOnceWith('COS');
+  expect(upsert).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      where: { provedor_idExterno: { provedor: 'igdb', idExterno: 1234n } },
+      create: {
+        provedor: 'igdb',
+        idExterno: 1234n,
+        titulo: jogoIgdb.titulo,
+        capa: jogoIgdb.capa,
+        descricao: jogoIgdb.descricao,
+        genero: 'Aventura, Estratégia',
+        plataformas: jogoIgdb.plataformas,
       },
+    }),
+  );
+});
+
+it('devolve lista vazia sem gravar jogos quando a IGDB não encontra títulos', async () => {
+  buscarIgdb.mockResolvedValue([]);
+
+  await request(app.getHttpServer())
+    .get('/games?q=inexistente')
+    .expect(200)
+    .expect({ resultados: [] });
+  expect(upsert).not.toHaveBeenCalled();
+});
+
+it.each(['timeout', 'limite', 'resposta_invalida', 'configuracao'] as const)(
+  'responde 503 sem expor o erro %s da IGDB',
+  async (motivo) => {
+    buscarIgdb.mockRejectedValue(new ErroIgdb(motivo));
+
+    await request(app.getHttpServer()).get('/games?q=ecos').expect(503).expect({
+      statusCode: 503,
+      message: 'A pesquisa de jogos está temporariamente indisponível',
+      error: 'Service Unavailable',
     });
-  });
+    expect(upsert).not.toHaveBeenCalled();
+  },
+);
 
-  it('devolve lista vazia quando não há jogos correspondentes', async () => {
-    findMany.mockResolvedValue([]);
-
-    await request(app.getHttpServer())
-      .get('/games?q=inexistente')
-      .expect(200)
-      .expect({ resultados: [] });
-  });
-
-  it('trata os caracteres do padrão SQL como parte do título', async () => {
-    findMany.mockResolvedValue([]);
-
-    await request(app.getHttpServer())
-      .get('/games')
-      .query({ q: '100%_\\' })
-      .expect(200)
-      .expect({ resultados: [] });
-
-    expect(findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { titulo: { contains: '100\\%\\_\\\\' } },
+it('preenche campos ausentes na criação e os ignora na atualização', async () => {
+  buscarIgdb.mockResolvedValue([
+    { ...jogoIgdb, capa: null, descricao: null, generos: [], plataformas: [] },
+  ]);
+  upsert.mockResolvedValue({ ...jogos[0], capa: '' });
+  await request(app.getHttpServer()).get('/games?q=ecos').expect(200);
+  expect(upsert).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      create: expect.objectContaining({
+        capa: '',
+        descricao: '',
+        genero: '',
+        plataformas: [],
       }),
-    );
-  });
+      update: {
+        titulo: jogoIgdb.titulo,
+        capa: undefined,
+        descricao: undefined,
+        genero: undefined,
+        plataformas: undefined,
+      },
+    }),
+  );
+});
+
+it('armazena textos longos dentro dos limites Unicode das colunas', async () => {
+  const prefixoDescricao = 'x'.repeat(65_534);
+  buscarIgdb.mockResolvedValue([
+    {
+      ...jogoIgdb,
+      titulo: 'Ecos ' + '🌙'.repeat(190),
+      descricao: prefixoDescricao + '🌙',
+    },
+  ]);
+  upsert.mockResolvedValue(jogos[0]);
+
+  await request(app.getHttpServer()).get('/games?q=ecos').expect(200);
+  expect(upsert).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      create: expect.objectContaining({
+        titulo: 'Ecos ' + '🌙'.repeat(186),
+        descricao: prefixoDescricao,
+      }),
+    }),
+  );
+});
+
+it('reutiliza o ID local ao disputar a inserção e abre os detalhes pelo link direto', async () => {
+  buscarIgdb.mockResolvedValue([jogoIgdb]);
+  upsert.mockResolvedValueOnce(jogos[0]).mockRejectedValueOnce(
+    new Prisma.PrismaClientKnownRequestError('Identidade externa duplicada', {
+      code: 'P2002',
+      clientVersion: 'teste',
+    }),
+  );
+  update.mockResolvedValue(jogos[0]);
+  findUnique.mockResolvedValue({ ...jogos[0], ...detalhes });
+  const resposta = { resultados: [{ ...jogos[0], mediaAvaliacao: 9.4 }] };
+  await Promise.all([
+    request(app.getHttpServer())
+      .get('/games?q=ecos')
+      .expect(200)
+      .expect(resposta),
+    request(app.getHttpServer())
+      .get('/games?q=ecos')
+      .expect(200)
+      .expect(resposta),
+  ]);
+  expect(update).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      where: { provedor_idExterno: { provedor: 'igdb', idExterno: 1234n } },
+      data: expect.not.objectContaining({ mediaAvaliacao: expect.anything() }),
+    }),
+  );
+  buscarIgdb.mockRejectedValue(new ErroIgdb('indisponivel'));
+  await request(app.getHttpServer())
+    .get('/games/1')
+    .expect(200)
+    .expect({ ...jogos[0], ...detalhes, mediaAvaliacao: 9.4 });
+  expect(buscarIgdb).toHaveBeenCalledTimes(2);
 });
 
 describe('validação de GET /games', () => {
   it.each(['/games', '/games?q=', '/games?q=%20%20', '/games?q=a&q=b'])(
-    'devolve 400 para %s sem consultar o banco',
+    'devolve 400 para %s antes de buscar ou gravar jogos',
     async (url) => {
       await request(app.getHttpServer()).get(url).expect(400).expect({
         statusCode: 400,
@@ -112,7 +218,8 @@ describe('validação de GET /games', () => {
         error: 'Bad Request',
       });
 
-      expect(findMany).not.toHaveBeenCalled();
+      expect(buscarIgdb).not.toHaveBeenCalled();
+      expect(upsert).not.toHaveBeenCalled();
     },
   );
 });

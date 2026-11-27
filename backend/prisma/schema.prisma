@@ -27,7 +27,11 @@ model Jogo {
   mediaAvaliacao  Decimal?    @db.Decimal(3, 1)
   totalAvaliacoes Int         @default(0)
   chaveSeed       String?     @unique
+  provedor        String?     @db.VarChar(32)
+  idExterno       BigInt?     @db.UnsignedBigInt
   avaliacoes      Avaliacao[]
+
+  @@unique([provedor, idExterno])
 }
 
 model Avaliacao {
