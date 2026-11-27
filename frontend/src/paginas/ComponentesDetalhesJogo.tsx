@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { CapaJogo, NotaComunidade } from '../componentes/ComponentesCatalogo';
 import type { AvaliacaoPropria, JogoDetalhes } from '../servicos/api';
 
 export type EstadoDetalhes =
@@ -12,18 +13,6 @@ export type EstadoAvaliacao =
   | { fase: 'sem_nota' }
   | { fase: 'com_nota'; avaliacao: AvaliacaoPropria }
   | { fase: 'falhou'; mensagem: string };
-
-function descreverMedia(jogo: JogoDetalhes): string {
-  if (jogo.mediaAvaliacao === null) return 'Ainda sem avaliações';
-  return jogo.mediaAvaliacao.toLocaleString('pt-BR', {
-    maximumFractionDigits: 1,
-    minimumFractionDigits: 1,
-  });
-}
-
-function descreverTotal(total: number): string {
-  return `${total} ${total === 1 ? 'avaliação' : 'avaliações'}`;
-}
 
 export function CabecalhoDetalhes({ autenticado }: { autenticado: boolean }) {
   return (
@@ -80,21 +69,17 @@ export function InformacoesJogo({ jogo }: { jogo: JogoDetalhes }) {
   return (
     <section aria-labelledby="detalhes-titulo" className="detalhes-jogo">
       <div className="detalhes-capa">
-        {jogo.capa ? (
-          <img alt={`Capa de ${jogo.titulo}`} src={jogo.capa} />
-        ) : (
-          <span aria-label={`Capa indisponível para ${jogo.titulo}`} role="img">
-            Capa indisponível
-          </span>
-        )}
+        <CapaJogo jogo={jogo} key={jogo.capa} />
       </div>
       <div className="detalhes-conteudo">
         <h1 id="detalhes-titulo">{jogo.titulo}</h1>
-        <p className="detalhes-descricao">{jogo.descricao}</p>
+        <p className="detalhes-descricao">
+          {jogo.descricao.trim() || 'Descrição indisponível.'}
+        </p>
         <dl className="detalhes-metadados">
           <div>
             <dt>Gênero</dt>
-            <dd>{jogo.genero}</dd>
+            <dd>{jogo.genero.trim() || 'Não informado'}</dd>
           </div>
           <div>
             <dt>Plataformas</dt>
@@ -105,14 +90,7 @@ export function InformacoesJogo({ jogo }: { jogo: JogoDetalhes }) {
             </dd>
           </div>
         </dl>
-        <p className="detalhes-media">
-          <strong>Média:</strong>{' '}
-          {jogo.mediaAvaliacao === null
-            ? descreverMedia(jogo)
-            : `${descreverMedia(jogo)}/10`}{' '}
-          <span aria-hidden="true">·</span> <strong>Total:</strong>{' '}
-          {descreverTotal(jogo.totalAvaliacoes)}
-        </p>
+        <NotaComunidade className="detalhes-media" jogo={jogo} />
       </div>
     </section>
   );

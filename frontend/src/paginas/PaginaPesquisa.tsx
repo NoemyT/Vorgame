@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import {
+  CapaJogo,
+  CreditoIgdb,
+  NotaComunidade,
+} from '../componentes/ComponentesCatalogo';
+import {
   ApiIndisponivelError,
   buscarJogos,
   ErroHttpApi,
@@ -18,43 +23,26 @@ function descreverErro(erro: unknown): string {
   if (erro instanceof ErroHttpApi && erro.statusCode === 400) {
     return 'Informe um título para pesquisar.';
   }
+  if (erro instanceof ErroHttpApi && erro.statusCode === 503) {
+    return 'A pesquisa de jogos está temporariamente indisponível. Tente novamente.';
+  }
   if (erro instanceof ApiIndisponivelError) {
     return 'Não foi possível carregar os resultados. Verifique a conexão e tente novamente.';
   }
   return 'Não foi possível carregar os resultados. Tente novamente.';
 }
 
-function descreverMedia(jogo: JogoResumo): string {
-  if (jogo.mediaAvaliacao === null) return 'Média indisponível';
-  return `Média: ${jogo.mediaAvaliacao.toLocaleString('pt-BR', {
-    maximumFractionDigits: 1,
-    minimumFractionDigits: 1,
-  })}/10`;
-}
-
-function descreverTotal(total: number): string {
-  return `${total} ${total === 1 ? 'avaliação' : 'avaliações'}`;
-}
-
 function ResultadoJogo({ jogo }: { jogo: JogoResumo }) {
   return (
     <li className="pesquisa-resultado">
       <div className="pesquisa-capa">
-        {jogo.capa ? (
-          <img alt={`Capa de ${jogo.titulo}`} loading="lazy" src={jogo.capa} />
-        ) : (
-          <span aria-label={`Capa indisponível para ${jogo.titulo}`} role="img">
-            Capa indisponível
-          </span>
-        )}
+        <CapaJogo carregamento="lazy" jogo={jogo} key={jogo.capa} />
       </div>
       <div className="pesquisa-detalhes">
         <h3>
           <Link to={`/jogos/${jogo.id}`}>{jogo.titulo}</Link>
         </h3>
-        <p>
-          {`${descreverMedia(jogo)} · ${descreverTotal(jogo.totalAvaliacoes)}`}
-        </p>
+        <NotaComunidade jogo={jogo} />
       </div>
     </li>
   );
@@ -76,12 +64,7 @@ function PainelResultados({
   }
   if (estado.fase === 'carregando') {
     return (
-      <p
-        aria-busy="true"
-        className="pesquisa-mensagem"
-        role="status"
-        aria-live="polite"
-      >
+      <p aria-busy="true" className="pesquisa-mensagem" role="status">
         Buscando jogos… A API pode levar até 1 minuto para responder após ficar
         hibernada.
       </p>
@@ -121,6 +104,23 @@ interface TelaPesquisaProps {
   tentarNovamente: () => void;
 }
 
+function CabecalhoPesquisa() {
+  return (
+    <header className="pesquisa-header">
+      <Link className="pesquisa-brand" to="/pesquisa">
+        VORGAME
+      </Link>
+      <nav aria-label="Navegação principal">
+        <Link aria-current="page" to="/pesquisa">
+          Pesquisar jogos
+        </Link>
+        <Link to="/login">Entrar</Link>
+        <Link to="/cadastro">Criar conta</Link>
+      </nav>
+    </header>
+  );
+}
+
 function TelaPesquisa({
   termo,
   estado,
@@ -130,18 +130,7 @@ function TelaPesquisa({
 }: TelaPesquisaProps) {
   return (
     <div className="pesquisa-page">
-      <header className="pesquisa-header">
-        <Link className="pesquisa-brand" to="/pesquisa">
-          VORGAME
-        </Link>
-        <nav aria-label="Navegação principal">
-          <Link aria-current="page" to="/pesquisa">
-            Pesquisar jogos
-          </Link>
-          <Link to="/login">Entrar</Link>
-          <Link to="/cadastro">Criar conta</Link>
-        </nav>
-      </header>
+      <CabecalhoPesquisa />
       <main className="pesquisa-main">
         <p className="pesquisa-eyebrow">Descubra seu próximo jogo</p>
         <h1>Pesquisar jogos</h1>
@@ -157,18 +146,13 @@ function TelaPesquisa({
               value={termo}
             />
           </div>
-          <button
-            disabled={estado.fase === 'carregando'}
-            type="submit"
-          >
+          <button disabled={estado.fase === 'carregando'} type="submit">
             {estado.fase === 'carregando' ? 'Pesquisando…' : 'Pesquisar'}
           </button>
         </form>
+        <CreditoIgdb />
         <section aria-label="Jogos encontrados" className="pesquisa-conteudo">
-          <PainelResultados
-            estado={estado}
-            tentarNovamente={tentarNovamente}
-          />
+          <PainelResultados estado={estado} tentarNovamente={tentarNovamente} />
         </section>
       </main>
     </div>

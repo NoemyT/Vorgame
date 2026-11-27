@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { CreditoIgdb } from '../componentes/ComponentesCatalogo';
 import {
   ApiIndisponivelError,
   consultarJogo,
@@ -171,6 +172,7 @@ function DetalhesJogo({ idParam }: { idParam: string | undefined }) {
         {detalhes.fase === 'concluido' && (
           <>
             <InformacoesJogo jogo={detalhes.jogo} />
+            <CreditoIgdb />
             <PainelAvaliacaoConectado
               expirarSessao={setAutenticado}
               jogoId={detalhes.jogo.id}
