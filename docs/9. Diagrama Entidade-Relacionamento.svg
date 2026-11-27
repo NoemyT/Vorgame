@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 455" width="1010" height="455" role="img" aria-labelledby="titulo descricao">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 540" width="1040" height="540" role="img" aria-labelledby="titulo descricao">
   <title id="titulo">Diagrama entidade-relacionamento do Vorgame</title>
-  <desc id="descricao">Usuario e Jogo se relacionam com Avaliacao por chaves estrangeiras. Cada combinação de usuário e jogo admite uma avaliação.</desc>
+  <desc id="descricao">Cada combinação de usuário e jogo admite uma avaliação. Avaliacao.jogoId referencia o ID local de Jogo. Os jogos externos têm uma chave única composta por provedor e idExterno.</desc>
   <style>
     text { font-family: system-ui, sans-serif; fill: #152b43; }
     .titulo { font-size: 23px; font-weight: 700; }
@@ -12,8 +12,8 @@
     .cabecalho { fill: #214d79; }
     .relacao { stroke: #214d79; stroke-width: 1.75; }
   </style>
-  <rect width="1010" height="455" fill="#f6f9fc"/>
-  <text x="24" y="40" class="titulo">Vorgame · Entidades da Etapa 4</text>
+  <rect width="1040" height="540" fill="#f6f9fc"/>
+  <text x="24" y="40" class="titulo">Vorgame · Modelo de dados</text>
 
   <path d="M 264,168 H 345 M 635,168 H 716" fill="none" class="relacao"/>
   <text x="274" y="154" class="legenda">1</text>
@@ -52,8 +52,8 @@
   </g>
 
   <g transform="translate(716 67)">
-    <rect width="270" height="280" rx="8" class="tabela"/>
-    <path d="M 0,37 V 8 Q 0,0 8,0 H 262 Q 270,0 270,8 V 37 Z" class="cabecalho"/>
+    <rect width="300" height="352" rx="8" class="tabela"/>
+    <path d="M 0,37 V 8 Q 0,0 8,0 H 292 Q 300,0 300,8 V 37 Z" class="cabecalho"/>
     <text x="14" y="25" class="entidade">Jogo</text>
     <g class="campo" transform="translate(14 59)">
       <text y="0" class="chave">id · INT · PK</text>
@@ -65,9 +65,13 @@
       <text y="144">mediaAvaliacao · DECIMAL(3,1) · NULL</text>
       <text y="168">totalAvaliacoes · INT · padrão 0</text>
       <text y="192">chaveSeed · VARCHAR(191) · UQ · NULL</text>
+      <text y="216">provedor · VARCHAR(32) · NULL</text>
+      <text y="240">idExterno · BIGINT UNSIGNED · NULL</text>
+      <text y="264">UQ (provedor, idExterno)</text>
     </g>
   </g>
 
-  <text x="24" y="392" class="legenda">PK = chave primária autoincremental · FK = chave estrangeira · UQ = restrição de unicidade</text>
-  <text x="24" y="416" class="legenda">Campos obrigatórios, exceto os marcados como NULL.</text>
+  <text x="24" y="464" class="legenda">PK = chave primária autoincremental · FK = chave estrangeira · UQ = restrição de unicidade</text>
+  <text x="24" y="488" class="legenda">Avaliacao.jogoId referencia o ID local. O par de campos externos identifica os jogos da IGDB.</text>
+  <text x="24" y="512" class="legenda">Nos jogos do seed, a chaveSeed identifica o registro e os campos de identidade externa ficam nulos.</text>
 </svg>

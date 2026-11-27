@@ -28,11 +28,12 @@ src/
   configurar-app.ts     CORS e encerramento da aplicação
   app.module.ts         módulo raiz
   database/             persistência: PrismaService (acesso ao banco)
+  catalogo/igdb/        OAuth da Twitch, consulta à IGDB e normalização
   health/               rota GET /health
 prisma/
   schema.prisma         esquema de usuários, jogos e avaliações
   migrations/           migrations SQL versionadas
-  seed.mjs              carga inicial do catálogo
+  seed.mjs              carga inicial de jogos fictícios (opcional)
 test/
   health.e2e-spec.ts    testes de ponta a ponta da rota /health
 ```
@@ -47,14 +48,34 @@ Copie `.env.example` para `.env` e preencha os valores. O arquivo `.env` nunca v
 | `PORT`         | Porta da API. Local: 3000. No Render, é definida automaticamente.                                                |
 | `CORS_ORIGIN`  | Endereços que podem chamar a API, separados por vírgula. Ex.: `http://localhost:5173,https://vorgame.vercel.app` |
 | `JWT_SECRET`   | Segredo aleatório de alta entropia para o JWT HS256. Os tokens expiram em uma hora. |
+| `IGDB_CLIENT_ID` | Client ID do aplicativo confidencial cadastrado na Twitch |
+| `IGDB_CLIENT_SECRET` | Client Secret do mesmo aplicativo |
 
-O navegador não acessa o banco diretamente.
+## Cadastro do aplicativo na Twitch
+
+1. Entre no painel de desenvolvedores com uma conta Twitch de e-mail verificado e autenticação de dois fatores ativa. [Painel de aplicações](https://dev.twitch.tv/console/apps)
+2. Registre uma aplicação, selecione o tipo **Confidential** e preencha o campo de redirecionamento com `http://localhost:3000`. O fluxo da IGDB dispensa redirecionamento. [Cadastro na IGDB](https://api-docs.igdb.com/#account-creation)
+3. Abra **Manage**, copie o **Client ID** e use **New Secret** para gerar o **Client Secret**. Preencha as variáveis somente no ambiente do backend. [Cadastro de app na Twitch](https://dev.twitch.tv/docs/authentication/register-app/)
+
+```dotenv
+IGDB_CLIENT_ID=<client_id_do_app>
+IGDB_CLIENT_SECRET=<client_secret_do_app>
+```
+
+O backend usa OAuth 2.0 `client_credentials` em `POST https://id.twitch.tv/oauth2/token`, mantém o token de aplicação em memória de acordo com sua validade e usa `Client-ID` e `Authorization: Bearer` em `POST https://api.igdb.com/v4/games`. O JWT do Vorgame autentica o usuário nas avaliações. [OAuth da Twitch](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow) · [Requisições à IGDB](https://api-docs.igdb.com/#requests)
+
+## Uso da IGDB
+
+- A IGDB limita a 4 requisições por segundo e a 8 requisições abertas simultaneamente. O adaptador espaça o início das consultas em pelo menos 250 ms, admite até 8 buscas em andamento ou na fila por instância e usa timeout de 5 segundos por requisição externa. Uma falha da fonte, incluindo `429`, vira `503` na busca do Vorgame. [Limites da IGDB](https://api-docs.igdb.com/#rate-limits)
+- O Vorgame guarda o vínculo com o ID da IGDB e os metadados usados nos detalhes. A capa é armazenada como URL. A média e o total vêm das avaliações do Vorgame. [Regras de persistência](../docs/8.%20Modelo%20de%20Dados%20e%20Seed.md#regras-de-persistência) · [FAQ da IGDB sobre armazenamento](https://api-docs.igdb.com/#faq)
+- A atribuição prevista para a pesquisa e os detalhes é [Dados de jogos: IGDB](https://www.igdb.com/). A exibição desse crédito está pendente no frontend.
 
 ## Como rodar localmente
 
 ```bash
 cd backend
 npm ci              # instala as dependências e gera o Prisma Client
+npx prisma migrate deploy
 npm run start:dev   # API em http://localhost:3000
 ```
 
@@ -75,14 +96,13 @@ Com `DATABASE_URL` apontando para o banco-alvo, rode os comandos abaixo a partir
 ```bash
 npx prisma migrate status
 npx prisma migrate deploy
-npx prisma db seed
 ```
 
-O seed pode ser reaplicado. Ele atualiza os dados dos quatro jogos pela `chaveSeed` e preserva as avaliações, a média e o total. Consulte o [modelo de dados e seed](../docs/8.%20Modelo%20de%20Dados%20e%20Seed.md).
+Para carregar os quatro jogos fictícios em um banco de desenvolvimento, execute `npx prisma db seed`. Reaplicar o seed atualiza os jogos pela `chaveSeed` e preserva avaliações, média e total. Esses jogos continuam acessíveis pelo ID local. A busca consulta a IGDB. Consulte o [modelo de dados e seed](../docs/8.%20Modelo%20de%20Dados%20e%20Seed.md).
 
 ## Rota de saúde
 
-`GET /health` executa `SELECT 1` no banco.
+`GET /health` executa `SELECT 1` no banco. A busca é a rota usada para verificar a integração com a IGDB.
 
 | Situação                | Resposta                                     |
 | ----------------------- | -------------------------------------------- |
@@ -96,6 +116,17 @@ O seed pode ser reaplicado. Ele atualiza os dados dos quatro jogos pela `chaveSe
 
 A documentação cobre as rotas de HU01 a HU05 e a rota de saúde. Na interface, use **Authorize** com o token retornado por `POST /auth/login` para testar as rotas protegidas.
 
+## Roteiro de aceite com Terraria
+
+Use o backend com as credenciais da IGDB, um banco de desenvolvimento migrado e uma conta de teste.
+
+1. Na [tela de pesquisa](http://localhost:5173/pesquisa), busque **Terraria**. Abra o resultado e anote o número de `/jogos/{id}`. Consulte `GET /games/{id}` no Swagger e confira se a resposta usa o mesmo ID.
+2. Repita `GET /games?q=terraria` e confirme que o resultado de Terraria mantém o ID. Escolha o resultado pelo título, pois a lista pode incluir outros jogos com Terraria no nome.
+3. No Swagger, cadastre uma conta de teste com `POST /auth/register`, autentique com `POST /auth/login` e use o JWT em **Authorize**.
+4. Com o ID anotado, envie `{"nota": 8}` a `POST /games/{id}/ratings`. Confira `201` e o mesmo número em `jogoId`. Consulte `GET /games/{id}/ratings/me` para confirmar a nota.
+5. Envie `{"nota": 10}` a `PUT /games/{id}/ratings/me`. Confira a nota, a média recalculada e o total preservado. Em um jogo sem outras notas, a média passa de 8,0 para 10,0 e o total fica em 1.
+6. Entre no frontend com a mesma conta de teste e reabra os detalhes. Confira a média da comunidade e a nota atual do usuário.
+
 ## Deploy no Render
 
 | Campo             | Valor                          |
@@ -104,13 +135,16 @@ A documentação cobre as rotas de HU01 a HU05 e a rota de saúde. Na interface,
 | Build Command     | `npm ci && npm run build`      |
 | Start Command     | `npm run start:prod`           |
 | Health Check Path | `/health`                      |
-| Variáveis         | `DATABASE_URL`, `CORS_ORIGIN` e `JWT_SECRET` |
+| Variáveis         | `DATABASE_URL`, `CORS_ORIGIN`, `JWT_SECRET`, `IGDB_CLIENT_ID` e `IGDB_CLIENT_SECRET` |
+
+Aplique a migration de identidade externa ao banco do ambiente antes de disponibilizar a busca da IGDB.
 
 No plano gratuito, o backend hiberna após cerca de 15 minutos sem acesso. O primeiro acesso depois disso leva em torno de 30 segundos.
 
 ## Estado atual
 
-O backend inclui `/health`, busca e detalhes de jogos, cadastro, login, consulta da conta autenticada e as três rotas de avaliação. A migration inicial cria as tabelas de usuários, jogos e avaliações, e o seed carrega o catálogo.
+- **Com respostas simuladas.** Os testes exercitam autenticação na Twitch, busca, erros da fonte e integração do catálogo. Com MariaDB isolado, foi verificado o vínculo entre busca, detalhes e gravação de nota.
+- **Com a IGDB real.** Em 27/11/2026, o aceite via API em MariaDB isolado encontrou Terraria, abriu os detalhes e criou, consultou e alterou a nota da conta de teste. Uma nova busca confirmou o mesmo ID e os agregados da avaliação. [Verificações de persistência](../docs/8.%20Modelo%20de%20Dados%20e%20Seed.md#implementação-e-validação)
 
 ## Referências
 

@@ -16,11 +16,15 @@
 
 React permite organizar as telas em componentes reutilizáveis, e TypeScript explicita os dados trocados com a API. Vite fornece o ambiente de desenvolvimento e o build da aplicação. CSS e `fetch` atendem às necessidades iniciais sem bibliotecas adicionais de estilos ou de requisições.
 
-## Integração prevista
+## Integração com o catálogo
 
-O frontend será uma aplicação React com navegação no navegador, consumindo a API REST do backend NestJS em JSON. MySQL e Prisma serão utilizados exclusivamente pelo backend. As telas seguirão as [histórias de usuário](../docs/1.%20Hist%C3%B3rias%20de%20Usu%C3%A1rio%20%28Alta%29.md) e o recorte da entrega.
+A aplicação React consome a API REST do Vorgame em JSON. A busca em `/pesquisa` usa `GET /games?q={termo}` e abre `/jogos/:id` com o ID numérico que o backend atribui ao jogo. A tela de detalhes usa esse mesmo ID para consultar os dados armazenados e a nota do usuário autenticado.
 
-A URL da API será configurada pela variável `VITE_API_BASE_URL`. Variáveis expostas pelo Vite fazem parte do código entregue ao navegador; credenciais de banco e outros segredos pertencem ao backend.
+A URL da API vem de `VITE_API_BASE_URL`. O backend configura `IGDB_CLIENT_ID` e `IGDB_CLIENT_SECRET` e faz o OAuth com a Twitch. A média exibida vem das avaliações do Vorgame.
+
+Uma busca concluída com lista vazia indica que nenhum jogo foi encontrado. Uma falha de busca, incluindo `503`, exibe uma mensagem genérica com a opção **Tentar novamente**. As telas mostram texto alternativo e avisam quando o campo de capa está vazio. Os detalhes indicam quando o jogo vem sem plataformas.
+
+O crédito visível [Dados de jogos: IGDB](https://www.igdb.com/), o tratamento de erros de carregamento de capa e a indicação de descrição ou gênero ausentes estão pendentes.
 
 ## Organização
 
@@ -72,7 +76,7 @@ npm run dev   # http://localhost:5173
 
 ## Estado atual
 
-Página de status da Etapa 2 implementada: chama `GET /health` e exibe "API OK · Banco OK", com mensagens para carregamento (incluindo o tempo de despertar do Render), banco com erro e API indisponível. As telas das histórias serão implementadas na Etapa 6.
+O frontend tem telas de status, cadastro, login, busca e detalhes. Em detalhes, o visitante recebe um link para entrar, e o usuário autenticado vê sua nota ou a indicação de que ainda não avaliou o jogo. A criação e a alteração da nota podem ser feitas no Swagger, conforme o [roteiro de aceite](../backend/README.md#roteiro-de-aceite-com-terraria).
 
 ## Referências
 
