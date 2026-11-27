@@ -169,7 +169,7 @@
 
 .pesquisa-resultado {
   display: grid;
-  grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr);
+  grid-template-columns: minmax(7rem, 11rem) 1fr;
   gap: 1.25rem;
 }
 
@@ -189,10 +189,6 @@
   height: 100%;
   min-height: 9rem;
   object-fit: cover;
-}
-
-.pesquisa-detalhes {
-  overflow-wrap: anywhere;
 }
 
 .pesquisa-detalhes h3 {
