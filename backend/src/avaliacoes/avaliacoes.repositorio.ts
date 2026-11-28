@@ -53,6 +53,23 @@ async function atualizarAgregados(
 export class AvaliacoesRepositorio {
   constructor(private readonly prisma: PrismaService) {}
 
+  async listarProprias(usuarioId: number) {
+    const avaliacoes = await this.prisma.avaliacao.findMany({
+      where: { usuarioId },
+      orderBy: [{ atualizadoEm: 'desc' }, { id: 'desc' }],
+      select: {
+        jogoId: true,
+        nota: true,
+        jogo: { select: { titulo: true, capa: true } },
+      },
+    });
+    return avaliacoes.map(({ jogoId, nota, jogo }) => ({
+      jogoId,
+      nota,
+      ...jogo,
+    }));
+  }
+
   buscarPropria(jogoId: number, usuarioId: number) {
     if (!idArmazenavel(jogoId)) {
       return null;

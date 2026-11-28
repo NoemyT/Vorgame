@@ -13,6 +13,7 @@ const operacoes = [
   ['/auth/me', 'get', ['200', '401'], true],
   ['/games', 'get', ['200', '400', '503'], false],
   ['/games/{id}', 'get', ['200', '400', '404'], false],
+  ['/ratings/me', 'get', ['200', '401'], true],
   ['/games/{id}/ratings/me', 'get', ['200', '400', '401', '404'], true],
   ['/games/{id}/ratings', 'post', ['201', '400', '401', '404', '409'], true],
   ['/games/{id}/ratings/me', 'put', ['200', '400', '401', '404'], true],

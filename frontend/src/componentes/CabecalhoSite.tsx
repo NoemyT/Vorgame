@@ -1,4 +1,4 @@
-import { CircleUserRound, Compass, Menu, Search } from 'lucide-react';
+import { Compass, ListChecks, Menu, Search } from 'lucide-react';
 import { NavLink } from 'react-router';
 import { Marca } from './Marca';
 import { Button } from './ui/button';
@@ -17,14 +17,6 @@ const linksCatalogo = [
   { para: '/pesquisa', texto: 'Pesquisar jogos', icone: Search },
 ];
 
-function SessaoAtiva() {
-  return (
-    <span className="sessao-site">
-      <CircleUserRound size={17} aria-hidden="true" /> Sessão ativa
-    </span>
-  );
-}
-
 function NavegacaoDesktop({ autenticado }: { autenticado: boolean }) {
   return (
     <div className="cabecalho-desktop">
@@ -37,7 +29,11 @@ function NavegacaoDesktop({ autenticado }: { autenticado: boolean }) {
       </nav>
       <div className="nav-conta">
         {autenticado ? (
-          <SessaoAtiva />
+          <Button asChild variant="ghost">
+            <NavLink to="/minhas-avaliacoes">
+              <ListChecks aria-hidden="true" /> Minhas avaliações
+            </NavLink>
+          </Button>
         ) : (
           <>
             <Button asChild variant="ghost">
@@ -75,7 +71,13 @@ function ContaMenuMovel({ autenticado }: { autenticado: boolean }) {
   return (
     <div className="menu-conta">
       {autenticado ? (
-        <SessaoAtiva />
+        <SheetClose asChild>
+          <Button asChild variant="outline">
+            <NavLink to="/minhas-avaliacoes">
+              <ListChecks aria-hidden="true" /> Minhas avaliações
+            </NavLink>
+          </Button>
+        </SheetClose>
       ) : (
         <>
           <SheetClose asChild>

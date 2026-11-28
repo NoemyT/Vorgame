@@ -29,6 +29,37 @@ export interface AvaliacaoGravada {
   totalAvaliacoes: number;
 }
 
+export interface AvaliacaoListada {
+  jogoId: number;
+  titulo: string;
+  capa: string;
+  nota: number;
+}
+
+export interface MinhasAvaliacoes {
+  avaliacoes: AvaliacaoListada[];
+}
+
+function ehAvaliacaoListada(corpo: unknown): corpo is AvaliacaoListada {
+  if (typeof corpo !== 'object' || corpo === null) return false;
+  const { jogoId, titulo, capa, nota } = corpo as Record<string, unknown>;
+  return (
+    Number.isSafeInteger(jogoId) &&
+    typeof titulo === 'string' &&
+    typeof capa === 'string' &&
+    typeof nota === 'number' &&
+    Number.isInteger(nota) &&
+    nota >= 0 &&
+    nota <= 10
+  );
+}
+
+export function ehMinhasAvaliacoes(corpo: unknown): corpo is MinhasAvaliacoes {
+  if (typeof corpo !== 'object' || corpo === null) return false;
+  const { avaliacoes } = corpo as Record<string, unknown>;
+  return Array.isArray(avaliacoes) && avaliacoes.every(ehAvaliacaoListada);
+}
+
 function ehJogoResumo(corpo: unknown): corpo is JogoResumo {
   if (typeof corpo !== 'object' || corpo === null) return false;
   const jogo = corpo as Record<string, unknown>;

@@ -21,7 +21,7 @@ export function RodapeSite({ autenticado }: { autenticado: boolean }) {
             {autenticado ? (
               <>
                 <span>Sessão ativa</span>
-                <Link to="/pesquisa">Consultar jogos</Link>
+                <Link to="/minhas-avaliacoes">Minhas avaliações</Link>
               </>
             ) : (
               <>

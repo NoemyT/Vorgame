@@ -4,14 +4,17 @@ import {
   ehAvaliacaoGravada,
   ehAvaliacaoPropria,
   ehJogoDetalhes,
+  ehMinhasAvaliacoes,
   ehResultadoBuscaJogos,
   type AvaliacaoGravada,
   type AvaliacaoPropria,
   type JogoDetalhes,
+  type MinhasAvaliacoes,
   type ResultadoBuscaJogos,
 } from './catalogo-respostas';
 export type {
   AvaliacaoGravada,
+  AvaliacaoListada,
   AvaliacaoPropria,
   JogoDetalhes,
   JogoResumo,
@@ -263,6 +266,16 @@ export async function consultarMinhaAvaliacao(
   return requisitarJson(`/games/${jogoId}/ratings/me`, {
     metodo: 'GET',
     validar: ehAvaliacaoPropria,
+    token,
+  });
+}
+
+export async function listarMinhasAvaliacoes(): Promise<MinhasAvaliacoes> {
+  const token = obterToken();
+  if (!token) throw new ErroHttpApi(401, 'Token ausente ou inválido');
+  return requisitarJson('/ratings/me', {
+    metodo: 'GET',
+    validar: ehMinhasAvaliacoes,
     token,
   });
 }

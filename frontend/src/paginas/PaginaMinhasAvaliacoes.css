@@ -1,0 +1,51 @@
+.minhas-avaliacoes-estado,
+.minhas-avaliacoes-lista {
+  margin-top: 1.5rem;
+}
+
+.minhas-avaliacoes-estado p + :is(a, div) {
+  margin-top: 0.75rem;
+}
+
+.minhas-avaliacoes-lista {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.minha-avaliacao-item {
+  display: grid;
+  grid-template-columns: 3.75rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.6rem, 2vw, 1rem);
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.minha-avaliacao-item:is(:hover, :focus-visible) {
+  background: var(--secondary);
+  border-color: var(--input);
+}
+
+.minha-avaliacao-item h2 {
+  font-size: clamp(1.35rem, 3.8vw, 1.9rem);
+}
+
+.minha-avaliacao-item p {
+  margin-top: 0.25rem;
+  color: var(--muted-foreground);
+}
+
+.minha-avaliacao-item > svg,
+.minha-avaliacao-item strong {
+  color: var(--primary);
+}
+
+.minha-avaliacao-item strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.minha-avaliacao-item .capa-jogo {
+  border-radius: 0.35rem;
+}

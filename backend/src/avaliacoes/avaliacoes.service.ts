@@ -8,6 +8,10 @@ import {
 export class AvaliacoesService {
   constructor(private readonly repositorio: AvaliacoesRepositorio) {}
 
+  listarProprias(usuarioId: number) {
+    return this.repositorio.listarProprias(usuarioId);
+  }
+
   consultarPropria(jogoId: number, usuarioId: number) {
     return this.repositorio.buscarPropria(jogoId, usuarioId);
   }

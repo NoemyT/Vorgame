@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { gravarAvaliacao } from './api';
+import { gravarAvaliacao, listarMinhasAvaliacoes } from './api';
 
 function simularResposta(status: number, corpo: unknown): void {
   vi.stubGlobal(
@@ -10,13 +10,32 @@ function simularResposta(status: number, corpo: unknown): void {
   );
 }
 
-describe('gravarAvaliacao', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    vi.unstubAllEnvs();
-    sessionStorage.clear();
-  });
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+  sessionStorage.clear();
+});
 
+describe('listarMinhasAvaliacoes', () => {
+  it('consulta o histórico com o token da sessão', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'https://api.exemplo.com');
+    sessionStorage.setItem('vorgame_token', 'jwt-ficticio');
+    const resposta = {
+      avaliacoes: [{ jogoId: 7, titulo: 'Ecos de Órbita', capa: '', nota: 0 }],
+    };
+    simularResposta(200, resposta);
+    await expect(listarMinhasAvaliacoes()).resolves.toEqual(resposta);
+    expect(fetch).toHaveBeenCalledWith(
+      'https://api.exemplo.com/ratings/me',
+      expect.objectContaining({
+        method: 'GET',
+        headers: { Authorization: 'Bearer jwt-ficticio' },
+      }),
+    );
+  });
+});
+
+describe('gravarAvaliacao', () => {
   it.each([
     ['criar', 'POST', '/games/7/ratings', 201],
     ['alterar', 'PUT', '/games/7/ratings/me', 200],

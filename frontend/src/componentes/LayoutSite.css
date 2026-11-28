@@ -108,18 +108,6 @@
   min-height: 2.5rem;
 }
 
-.sessao-site {
-  display: inline-flex;
-  gap: 0.45rem;
-  align-items: center;
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
-}
-
-.sessao-site svg {
-  color: var(--primary);
-}
-
 .cabecalho-movel {
   display: none;
   gap: 0.35rem;

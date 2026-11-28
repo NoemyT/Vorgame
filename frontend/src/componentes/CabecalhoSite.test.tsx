@@ -32,15 +32,23 @@ describe('CabecalhoSite', () => {
     expect(abrir).toHaveFocus();
   });
 
-  it('mostra o estado de sessão ativa ao usuário autenticado', async () => {
+  it('oferece Minhas avaliações no desktop e fecha o menu ao selecionar a página', async () => {
     const usuario = userEvent.setup();
     renderizar(true);
-    expect(screen.getByText('Sessão ativa')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Minhas avaliações' }),
+    ).toHaveAttribute('href', '/minhas-avaliacoes');
     await usuario.click(screen.getByRole('button', { name: 'Abrir menu' }));
     const menu = await screen.findByRole('dialog');
-    expect(within(menu).getByText('Sessão ativa')).toBeInTheDocument();
     expect(
       within(menu).queryByRole('link', { name: 'Entrar' }),
     ).not.toBeInTheDocument();
+    await usuario.click(
+      within(menu).getByRole('link', { name: 'Minhas avaliações' }),
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Minhas avaliações' }),
+    ).toHaveAttribute('aria-current', 'page');
   });
 });

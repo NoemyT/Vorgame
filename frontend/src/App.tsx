@@ -5,6 +5,7 @@ import { PaginaCreditos } from './paginas/PaginaCreditos';
 import { PaginaDetalhesJogo } from './paginas/PaginaDetalhesJogo';
 import { PaginaInicial } from './paginas/PaginaInicial';
 import { PaginaLogin } from './paginas/PaginaLogin';
+import { PaginaMinhasAvaliacoes } from './paginas/PaginaMinhasAvaliacoes';
 import { PaginaPesquisa } from './paginas/PaginaPesquisa';
 import { PaginaStatus } from './paginas/PaginaStatus';
 
@@ -17,6 +18,10 @@ export function App() {
           <Route path="/status" element={<PaginaStatus />} />
           <Route path="/cadastro" element={<PaginaCadastro />} />
           <Route path="/login" element={<PaginaLogin />} />
+          <Route
+            path="/minhas-avaliacoes"
+            element={<PaginaMinhasAvaliacoes />}
+          />
           <Route path="/pesquisa" element={<PaginaPesquisa />} />
           <Route path="/jogos/:id" element={<PaginaDetalhesJogo />} />
           <Route path="/creditos" element={<PaginaCreditos />} />
