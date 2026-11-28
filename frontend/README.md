@@ -8,13 +8,14 @@
 | Interface                   | React                                 |
 | Desenvolvimento e build     | Vite, template `react-ts`             |
 | Navegação                   | React Router                          |
-| Estilos                     | CSS                                   |
+| Estilos                     | CSS, Tailwind CSS 4 e tailwind-merge   |
+| Componentes e ícones        | Radix UI, componentes locais baseados em shadcn/ui e Lucide React |
 | Requisições HTTP            | API `fetch` do navegador              |
 | Ambiente de desenvolvimento | Node.js 22 LTS, com npm               |
 | Testes de componentes       | Vitest, jsdom e React Testing Library |
 | Linter                      | oxlint                                |
 
-React permite organizar as telas em componentes reutilizáveis, e TypeScript explicita os dados trocados com a API. Vite fornece o ambiente de desenvolvimento e o build da aplicação. CSS e `fetch` atendem às necessidades iniciais sem bibliotecas adicionais de estilos ou de requisições.
+React permite organizar as telas em componentes reutilizáveis, e TypeScript explicita os dados trocados com a API. Vite fornece o ambiente de desenvolvimento e o build da aplicação. CSS e Tailwind CSS organizam os estilos, com componentes reutilizáveis de interface. As requisições usam `fetch` sem biblioteca HTTP adicional.
 
 ## Integração com o catálogo
 
@@ -22,9 +23,11 @@ A aplicação React consome a API REST do Vorgame em JSON. A busca em `/pesquisa
 
 A URL da API vem de `VITE_API_BASE_URL`. O backend configura `IGDB_CLIENT_ID` e `IGDB_CLIENT_SECRET` e faz o OAuth com a Twitch. A média exibida vem das avaliações do Vorgame.
 
-Uma busca concluída com lista vazia indica que nenhum jogo foi encontrado. Uma falha de busca, incluindo `503`, exibe uma mensagem genérica com a opção **Tentar novamente**. As telas mostram texto alternativo e avisam quando o campo de capa está vazio. Os detalhes indicam quando o jogo vem sem plataformas.
+Uma busca concluída com lista vazia indica que nenhum jogo foi encontrado. Uma falha de busca, incluindo `503`, exibe uma mensagem genérica com a opção **Tentar novamente**. As telas mostram texto alternativo e uma indicação de capa indisponível quando a URL está ausente ou a imagem falha ao carregar. Os detalhes também indicam a ausência de descrição, gênero ou plataformas.
 
-O crédito visível [Dados de jogos: IGDB](https://www.igdb.com/), o tratamento de erros de carregamento de capa e a indicação de descrição ou gênero ausentes estão pendentes.
+O crédito visível [Dados de jogos: IGDB](https://www.igdb.com/) aparece no rodapé compartilhado. A página `/creditos` registra as fontes das imagens da página inicial e a geração da marca Vorgame com ImageGen.
+
+A página inicial apresenta uma curadoria de títulos predefinidos, consultados pela API. Quando há uma correspondência exata e única, o link abre os detalhes pelo ID local; caso contrário, encaminha para a pesquisa.
 
 ## Organização
 
@@ -33,7 +36,11 @@ src/
   main.tsx              inicia a aplicação
   App.tsx               rotas (React Router)
   servicos/api.ts       camada de serviço: todas as chamadas à API passam por aqui
-  paginas/              telas
+  servicos/sessao.ts    sessão JWT em sessionStorage
+  servicos/catalogo-respostas.ts  tipos e validação das respostas do catálogo
+  catalogo/            curadoria e apresentação de jogos
+  componentes/         layout, capas, formulários e componentes de interface
+  paginas/              telas e fluxos de avaliação
   testes/configurar.ts  configuração dos testes
 vercel.json             faz todas as rotas abrirem o index.html (navegação do React Router)
 ```
@@ -74,9 +81,30 @@ npm run dev   # http://localhost:5173
 | Output Directory | `dist`              |
 | Variável         | `VITE_API_BASE_URL` |
 
+## Telas e funcionalidades
+
+| Rota | Funcionalidade |
+| ---- | -------------- |
+| `/` | Página inicial com destaques e curadoria de jogos |
+| `/status` | Consulta à saúde da API e do banco |
+| `/cadastro` | HU01 — Criar conta |
+| `/login` | HU02 — Fazer login |
+| `/pesquisa` | HU03 — Pesquisar jogos |
+| `/jogos/:id` | HU04 — Visualizar detalhes e HU05 — Avaliar jogo |
+| `/minhas-avaliacoes` | Consultar as avaliações da própria conta |
+| `/creditos` | Créditos das imagens e da marca |
+
+A pesquisa e os detalhes são públicos. Para avaliar, o usuário deve estar autenticado. A sessão usa JWT armazenado em `sessionStorage`; respostas HTTP 401 da camada de serviço limpam o token.
+
+Na tela de detalhes, o usuário autenticado pode criar uma nota inteira de 0 a 10 ou alterar a nota existente. O serviço `gravarAvaliacao` utiliza `POST /games/{id}/ratings` para criação e `PUT /games/{id}/ratings/me` para alteração. Após salvar, a interface atualiza a nota pessoal, a média e o total de avaliações com a resposta da API.
+
+A página de minhas avaliações usa `GET /ratings/me` e permite voltar aos detalhes de cada jogo avaliado. As telas tratam carregamento, falhas e estados vazios quando aplicável.
+
 ## Estado atual
 
-O frontend tem telas de status, cadastro, login, busca e detalhes. Em detalhes, o visitante recebe um link para entrar, e o usuário autenticado vê sua nota ou a indicação de que ainda não avaliou o jogo. A criação e a alteração da nota podem ser feitas no Swagger, conforme o [roteiro de aceite](../backend/README.md#roteiro-de-aceite-com-terraria).
+O código final do frontend implementa as cinco histórias do escopo. A publicação de reviews (HU06) permanece adiada. Há testes automatizados de páginas, componentes e serviços, incluindo criação e alteração de notas, falhas de requisição e metadados ausentes. O roteiro de validação integrada está no [README do backend](../backend/README.md#roteiro-de-aceite-com-terraria).
+
+O Oxlint está configurado para o frontend, mas ainda não aplica todos os limites de tamanho e complexidade definidos no AGENTS.md. A existência dos testes não substitui a execução do aceite na versão publicada.
 
 ## Referências
 

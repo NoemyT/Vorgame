@@ -15,7 +15,7 @@ No produto completo, o usuário cria uma conta, pesquisa jogos, consulta seus de
 | HU05 — Avaliar jogo                   | Incluída (exige login)                      |
 | HU06 — Publicar review                | Adiada                                      |
 
-O [roteiro de demonstração](backend/README.md#roteiro-de-aceite-com-terraria) mostra como buscar Terraria, abrir seus detalhes e usar o mesmo ID para criar e alterar uma avaliação no Swagger.
+O [roteiro de demonstração](backend/README.md#roteiro-de-aceite-com-terraria) mostra como buscar Terraria, abrir seus detalhes e criar e alterar uma avaliação pela interface web e conferir a persistência pelo mesmo ID local.
 
 A pesquisa usa a IGDB v4. O backend obtém um token de aplicação por OAuth da Twitch e associa os resultados a IDs numéricos locais, usados nos detalhes e nas avaliações. Os jogos fictícios da carga inicial continuam acessíveis pelos links locais. A evolução do catálogo está registrada no [ADR-003](docs/2.%20ADR.md#adr-003-catálogo-de-jogos-com-igdb).
 
@@ -33,7 +33,7 @@ Definida no [ADR-002](docs/2.%20ADR.md).
 | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | Backend      | Node.js, TypeScript, NestJS (adaptador Express), validação com DTOs e `class-validator`, OpenAPI com `@nestjs/swagger` |
 | Persistência | MySQL (InnoDB), Prisma ORM e Prisma Migrate                                                                            |
-| Frontend     | React, TypeScript, Vite, React Router, CSS, `fetch`                                                                    |
+| Frontend     | React, TypeScript, Vite, React Router, CSS, Tailwind CSS, Radix UI, Lucide React, `fetch`                                                                    |
 | Catálogo externo | IGDB v4 com OAuth da Twitch no backend |
 | Testes       | Vitest e Supertest no backend; Vitest e React Testing Library no frontend                                              |
 
@@ -58,7 +58,7 @@ Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/REA
 ```
 /docs       documentação: histórias, ADRs, diagramas C4 e contrato da API
 /backend    API REST em NestJS com integração IGDB e persistência Prisma
-/frontend   aplicação web em React com cadastro, login, busca e detalhes
+/frontend   aplicação web em React com cadastro, login, busca, detalhes e avaliações
 ```
 
 ## Hospedagem
@@ -71,7 +71,9 @@ Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/REA
 
 ## Estado atual
 
-A busca de Terraria na IGDB, os detalhes e o fluxo de avaliação via API foram validados com um banco local isolado. A publicação da integração depende das credenciais no Render e da migration de identidade externa no TiDB Cloud.
+O código final do protótipo implementa as HU01 a HU05, incluindo criação e alteração de notas pela interface web, atualização da média e do total de avaliações e consulta das avaliações da própria conta. A página inicial apresenta uma seleção de jogos, e o rodapé inclui a atribuição à IGDB e o acesso aos créditos das imagens. A HU06 permanece fora do escopo.
+
+A busca de Terraria na IGDB, os detalhes e o fluxo de avaliação via API foram validados com um banco local isolado em 27/11/2026. Para publicar a versão final, o ambiente deve estar com as migrations aplicadas e as credenciais da IGDB configuradas no Render.
 
 - [Frontend hospedado na Vercel](https://vorgame.vercel.app)
 - [Rota de saúde da API hospedada no Render](https://vorgame-api.onrender.com/health)
