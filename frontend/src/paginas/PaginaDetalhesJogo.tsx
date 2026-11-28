@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { ArrowLeft } from 'lucide-react';
+import { Link, useLocation, useParams } from 'react-router';
+import { rotaPesquisa } from '../catalogo/apresentacao';
 import {
   ApiIndisponivelError,
   consultarJogo,
-  consultarMinhaAvaliacao,
   ErroHttpApi,
+  type AvaliacaoGravada,
 } from '../servicos/api';
-import { obterToken } from '../servicos/sessao';
 import {
-  CabecalhoDetalhes,
   InformacoesJogo,
-  PainelAvaliacao,
+  MediaComunidade,
   PainelDetalhes,
-  type EstadoAvaliacao,
   type EstadoDetalhes,
 } from './ComponentesDetalhesJogo';
+import { PainelAvaliacaoConectado } from './PainelAvaliacaoConectado';
 import './PaginaDetalhesJogo.css';
 
 function lerIdJogo(valor: string | undefined): number | null {
@@ -90,96 +90,57 @@ function useDadosJogo(idParam: string | undefined) {
         }
       : estado;
 
-  return { detalhes, id, tentativa, tentarNovamente };
-}
-
-async function carregarAvaliacaoPropria(
-  id: number,
-  estaAtivo: () => boolean,
-  atualizar: (estado: EstadoAvaliacao) => void,
-  expirarSessao: (autenticado: boolean) => void,
-) {
-  try {
-    const avaliacao = await consultarMinhaAvaliacao(id);
-    if (estaAtivo()) atualizar({ fase: 'com_nota', avaliacao });
-  } catch (erro: unknown) {
-    if (!estaAtivo()) return;
-    if (erro instanceof ErroHttpApi && erro.statusCode === 404) {
-      atualizar({ fase: 'sem_nota' });
-    } else if (erro instanceof ErroHttpApi && erro.statusCode === 401) {
-      expirarSessao(false);
-      atualizar({ fase: 'visitante', sessaoExpirada: true });
-    } else {
-      atualizar({
-        fase: 'falhou',
-        mensagem: 'Não foi possível consultar sua avaliação.',
-      });
-    }
-  }
-}
-
-function PainelAvaliacaoConectado({
-  jogoId,
-  expirarSessao,
-}: {
-  jogoId: number;
-  expirarSessao: (autenticado: boolean) => void;
-}) {
-  const [estado, setEstado] = useState<EstadoAvaliacao>(() =>
-    obterToken()
-      ? { fase: 'carregando' }
-      : { fase: 'visitante', sessaoExpirada: false },
-  );
-  const [tentativa, setTentativa] = useState(0);
-
-  useEffect(() => {
-    let ativo = true;
-    if (obterToken()) {
-      void carregarAvaliacaoPropria(
-        jogoId,
-        () => ativo,
-        setEstado,
-        expirarSessao,
-      );
-    }
-    return () => {
-      ativo = false;
-    };
-  }, [expirarSessao, jogoId, tentativa]);
-
-  function tentarNovamente() {
-    if (!obterToken()) return;
-    setEstado({ fase: 'carregando' });
-    setTentativa((valor) => valor + 1);
+  function atualizarMedia(avaliacao: AvaliacaoGravada) {
+    setEstado((atual) => {
+      if (atual.fase !== 'concluido') return atual;
+      const { mediaAvaliacao, totalAvaliacoes } = avaliacao;
+      return {
+        fase: 'concluido',
+        jogo: { ...atual.jogo, mediaAvaliacao, totalAvaliacoes },
+      };
+    });
   }
 
-  return <PainelAvaliacao estado={estado} tentarNovamente={tentarNovamente} />;
+  return { detalhes, tentativa, tentarNovamente, atualizarMedia };
+}
+
+function rotaDeVolta(origem: unknown) {
+  if (
+    origem &&
+    typeof origem === 'object' &&
+    'termo' in origem &&
+    typeof origem.termo === 'string'
+  ) {
+    return rotaPesquisa(origem.termo);
+  }
+  return '/pesquisa';
 }
 
 function DetalhesJogo({ idParam }: { idParam: string | undefined }) {
-  const [autenticado, setAutenticado] = useState(() => Boolean(obterToken()));
-  const { detalhes, tentativa, tentarNovamente } = useDadosJogo(idParam);
+  const { detalhes, tentativa, tentarNovamente, atualizarMedia } =
+    useDadosJogo(idParam);
+  const { state } = useLocation();
 
   return (
-    <div className="detalhes-page">
-      <CabecalhoDetalhes autenticado={autenticado} />
-      <main className="detalhes-main">
-        <p className="detalhes-voltar">
-          <Link to="/pesquisa">Voltar à pesquisa</Link>
-        </p>
-        <PainelDetalhes estado={detalhes} tentarNovamente={tentarNovamente} />
-        {detalhes.fase === 'concluido' && (
-          <>
-            <InformacoesJogo jogo={detalhes.jogo} />
+    <main className="limite pagina pagina-detalhes">
+      <Link className="detalhes-voltar" to={rotaDeVolta(state)}>
+        <ArrowLeft aria-hidden="true" size={17} /> Voltar à pesquisa
+      </Link>
+      <PainelDetalhes estado={detalhes} tentarNovamente={tentarNovamente} />
+      {detalhes.fase === 'concluido' && (
+        <>
+          <InformacoesJogo jogo={detalhes.jogo} />
+          <div className="detalhes-notas">
+            <MediaComunidade jogo={detalhes.jogo} />
             <PainelAvaliacaoConectado
-              expirarSessao={setAutenticado}
+              aoSalvar={atualizarMedia}
               jogoId={detalhes.jogo.id}
               key={`${detalhes.jogo.id}-${tentativa}`}
             />
-          </>
-        )}
-      </main>
-    </div>
+          </div>
+        </>
+      )}
+    </main>
   );
 }
 

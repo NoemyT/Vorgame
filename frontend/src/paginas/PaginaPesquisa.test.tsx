@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as api from '../servicos/api';
@@ -39,8 +39,45 @@ describe('PaginaPesquisa', () => {
     expect(
       await screen.findByRole('link', { name: 'Ecos de Órbita' }),
     ).toHaveAttribute('href', '/jogos/7');
-    expect(screen.getByText('Média: 9,4/10 · 12 avaliações')).toBeInTheDocument();
+    expect(screen.getByText('9,4/10')).toBeInTheDocument();
+    expect(screen.getByText('12 avaliações')).toBeInTheDocument();
     expect(buscar).toHaveBeenCalledWith('ecos');
+  });
+
+  it('valida título vazio ou composto só de espaços antes de consultar', async () => {
+    const buscar = vi.spyOn(api, 'buscarJogos');
+    renderizarPesquisa();
+    const campo = screen.getByRole('searchbox', { name: 'Nome do jogo' });
+    await userEvent.click(screen.getByRole('button', { name: 'Pesquisar' }));
+    expect(campo).toBeInvalid();
+    await pesquisar('  ');
+    expect(screen.getByRole('alert')).toHaveTextContent('Informe um título');
+    expect(buscar).not.toHaveBeenCalled();
+  });
+
+  it('trata capa quebrada e jogo sem avaliações em uma busca aberta pela URL', async () => {
+    vi.spyOn(api, 'buscarJogos').mockResolvedValue({
+      resultados: [
+        {
+          ...jogo,
+          capa: 'https://example.test/capa.webp',
+          mediaAvaliacao: null,
+          totalAvaliacoes: 0,
+        },
+      ],
+    });
+    render(
+      <MemoryRouter initialEntries={['/pesquisa?q=ecos']}>
+        <PaginaPesquisa />
+      </MemoryRouter>,
+    );
+
+    const capa = await screen.findByRole('img', {
+      name: `Capa de ${jogo.titulo}`,
+    });
+    fireEvent.error(capa);
+    expect(screen.getByText('Capa indisponível')).toBeInTheDocument();
+    expect(screen.getByText('Sem avaliações')).toBeInTheDocument();
   });
 
   it('informa quando a pesquisa não encontra jogos', async () => {

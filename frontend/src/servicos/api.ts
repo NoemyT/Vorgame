@@ -1,5 +1,23 @@
 import { limparToken, obterToken } from './sessao';
 
+import {
+  ehAvaliacaoGravada,
+  ehAvaliacaoPropria,
+  ehJogoDetalhes,
+  ehResultadoBuscaJogos,
+  type AvaliacaoGravada,
+  type AvaliacaoPropria,
+  type JogoDetalhes,
+  type ResultadoBuscaJogos,
+} from './catalogo-respostas';
+export type {
+  AvaliacaoGravada,
+  AvaliacaoPropria,
+  JogoDetalhes,
+  JogoResumo,
+  ResultadoBuscaJogos,
+} from './catalogo-respostas';
+
 const TEMPO_LIMITE_MS = 90_000;
 
 export type StatusServico = 'ok' | 'erro';
@@ -42,30 +60,6 @@ export interface SessaoLogin {
 
 export interface UsuarioAutenticado extends UsuarioLogado {
   email: string;
-}
-
-export interface JogoResumo {
-  id: number;
-  titulo: string;
-  capa: string;
-  mediaAvaliacao: number | null;
-  totalAvaliacoes: number;
-}
-
-export interface ResultadoBuscaJogos {
-  resultados: JogoResumo[];
-}
-
-export interface JogoDetalhes extends JogoResumo {
-  descricao: string;
-  genero: string;
-  plataformas: string[];
-}
-
-export interface AvaliacaoPropria {
-  jogoId: number;
-  nota: number;
-  atualizadoEm: string;
 }
 
 export class ApiIndisponivelError extends Error {
@@ -127,51 +121,6 @@ function ehUsuarioAutenticado(corpo: unknown): corpo is UsuarioAutenticado {
   return ehUsuarioLogado(corpo) && typeof usuario.email === 'string';
 }
 
-function ehJogoResumo(corpo: unknown): corpo is JogoResumo {
-  if (typeof corpo !== 'object' || corpo === null) return false;
-  const jogo = corpo as Record<string, unknown>;
-  return (
-    Number.isInteger(jogo.id) &&
-    typeof jogo.titulo === 'string' &&
-    typeof jogo.capa === 'string' &&
-    (jogo.mediaAvaliacao === null || typeof jogo.mediaAvaliacao === 'number') &&
-    Number.isInteger(jogo.totalAvaliacoes)
-  );
-}
-
-function ehResultadoBuscaJogos(corpo: unknown): corpo is ResultadoBuscaJogos {
-  if (typeof corpo !== 'object' || corpo === null) return false;
-  const resposta = corpo as Record<string, unknown>;
-  return (
-    Array.isArray(resposta.resultados) &&
-    resposta.resultados.every(ehJogoResumo)
-  );
-}
-
-function ehJogoDetalhes(corpo: unknown): corpo is JogoDetalhes {
-  if (typeof corpo !== 'object' || corpo === null) return false;
-  const jogo = corpo as Record<string, unknown>;
-  return (
-    ehJogoResumo(corpo) &&
-    typeof jogo.descricao === 'string' &&
-    typeof jogo.genero === 'string' &&
-    Array.isArray(jogo.plataformas) &&
-    jogo.plataformas.every((plataforma) => typeof plataforma === 'string')
-  );
-}
-
-function ehAvaliacaoPropria(corpo: unknown): corpo is AvaliacaoPropria {
-  if (typeof corpo !== 'object' || corpo === null) return false;
-  const avaliacao = corpo as Record<string, unknown>;
-  return (
-    Number.isInteger(avaliacao.jogoId) &&
-    Number.isInteger(avaliacao.nota) &&
-    Number(avaliacao.nota) >= 0 &&
-    Number(avaliacao.nota) <= 10 &&
-    typeof avaliacao.atualizadoEm === 'string'
-  );
-}
-
 function obterMensagemErro(corpo: unknown): string {
   if (typeof corpo !== 'object' || corpo === null) {
     return 'Revise os dados enviados e tente novamente.';
@@ -198,7 +147,7 @@ async function lerCorpoJson(resposta: Response): Promise<unknown> {
 }
 
 interface OpcoesJson<T> {
-  metodo: 'GET' | 'POST';
+  metodo: 'GET' | 'POST' | 'PUT';
   validar: (corpo: unknown) => corpo is T;
   dados?: unknown;
   token?: string;
@@ -314,6 +263,33 @@ export async function consultarMinhaAvaliacao(
   return requisitarJson(`/games/${jogoId}/ratings/me`, {
     metodo: 'GET',
     validar: ehAvaliacaoPropria,
+    token,
+  });
+}
+
+export async function gravarAvaliacao(
+  jogoId: number,
+  nota: number,
+  modo: 'criar' | 'alterar',
+): Promise<AvaliacaoGravada> {
+  const token = obterToken();
+  if (!token) throw new ErroHttpApi(401, 'Token ausente ou inv?lido');
+  if (
+    !Number.isSafeInteger(jogoId) ||
+    !Number.isInteger(nota) ||
+    nota < 0 ||
+    nota > 10
+  ) {
+    throw new ErroHttpApi(
+      400,
+      'Informe um identificador v?lido e uma nota inteira de 0 a 10.',
+    );
+  }
+  const editar = modo === 'alterar';
+  return requisitarJson(`/games/${jogoId}/ratings${editar ? '/me' : ''}`, {
+    metodo: editar ? 'PUT' : 'POST',
+    validar: ehAvaliacaoGravada,
+    dados: { nota },
     token,
   });
 }

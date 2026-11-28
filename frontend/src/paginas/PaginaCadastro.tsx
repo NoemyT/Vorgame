@@ -1,11 +1,15 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
+import { witcher } from '../catalogo/curadoria';
+import { CampoSenha, PainelConta } from '../componentes/PainelConta';
+import { Alert, AlertDescription } from '../componentes/ui/alert';
+import { Button } from '../componentes/ui/button';
+import { Input } from '../componentes/ui/input';
 import {
   ApiIndisponivelError,
   cadastrarUsuario,
   ErroHttpApi,
 } from '../servicos/api';
-import './PaginaCadastro.css';
 
 type EstadoCadastro =
   | { fase: 'ocioso' }
@@ -14,9 +18,8 @@ type EstadoCadastro =
   | { fase: 'falhou'; mensagem: string };
 
 function descreverErro(erro: unknown): string {
-  if (erro instanceof ErroHttpApi && erro.statusCode === 409) {
+  if (erro instanceof ErroHttpApi && erro.statusCode === 409)
     return erro.message;
-  }
   if (erro instanceof ErroHttpApi && erro.statusCode === 400) {
     return 'Confira os campos obrigatórios e o formato do e-mail.';
   }
@@ -29,6 +32,90 @@ function descreverErro(erro: unknown): string {
 function lerCampo(formulario: FormData, nome: string): string {
   const valor = formulario.get(nome);
   return typeof valor === 'string' ? valor : '';
+}
+
+function CamposCadastro() {
+  return (
+    <>
+      <div className="conta-campo">
+        <label htmlFor="cadastro-nome">Nome</label>
+        <Input
+          autoComplete="name"
+          id="cadastro-nome"
+          maxLength={191}
+          name="nome"
+          required
+        />
+      </div>
+      <div className="conta-campo">
+        <label htmlFor="cadastro-email">E-mail</label>
+        <Input
+          autoComplete="email"
+          id="cadastro-email"
+          maxLength={254}
+          name="email"
+          required
+          type="email"
+        />
+      </div>
+      <div className="conta-campo">
+        <label htmlFor="cadastro-username">Nome de usuário</label>
+        <Input
+          autoComplete="username"
+          id="cadastro-username"
+          maxLength={191}
+          name="username"
+          required
+        />
+      </div>
+      <CampoSenha autoComplete="new-password" id="cadastro-senha" />
+    </>
+  );
+}
+
+function FormularioCadastro({
+  estado,
+  enviar,
+}: {
+  estado: EstadoCadastro;
+  enviar: (evento: FormEvent<HTMLFormElement>) => void;
+}) {
+  if (estado.fase === 'concluido') {
+    return (
+      <section className="conta-feedback" role="status">
+        <h2>Conta criada com sucesso</h2>
+        <p>Entre para acessar os recursos da sua conta.</p>
+        <Button asChild>
+          <Link to="/login">Ir para login</Link>
+        </Button>
+      </section>
+    );
+  }
+  const enviando = estado.fase === 'enviando';
+  return (
+    <form className="conta-form" onSubmit={enviar}>
+      <CamposCadastro />
+      {estado.fase === 'falhou' && (
+        <Alert variant="destructive">
+          <AlertDescription>{estado.mensagem}</AlertDescription>
+        </Alert>
+      )}
+      {enviando && (
+        <p role="status">
+          Criando conta… A API pode levar até 1 minuto para responder.
+        </p>
+      )}
+      <Button disabled={enviando} type="submit">
+        {enviando ? 'Enviando…' : 'Criar conta'}
+      </Button>
+      <p className="conta-alternativa">
+        Já tem uma conta?{' '}
+        <Link className="link-texto" to="/login">
+          Entrar
+        </Link>
+      </p>
+    </form>
+  );
 }
 
 export function PaginaCadastro() {
@@ -52,88 +139,12 @@ export function PaginaCadastro() {
   }
 
   return (
-    <div className="cadastro-page">
-      <header className="cadastro-header">
-        <Link className="cadastro-brand" to="/cadastro">
-          VORGAME
-        </Link>
-        <nav aria-label="Navegação principal">
-          <Link to="/pesquisa">Pesquisar jogos</Link>
-          <Link to="/login">Entrar</Link>
-        </nav>
-      </header>
-      <main className="cadastro-main">
-        <p className="cadastro-eyebrow">Junte-se à comunidade</p>
-        <h1>Criar conta</h1>
-        <p className="cadastro-intro">
-          Cadastre-se para registrar suas avaliações de jogos.
-        </p>
-        {estado.fase === 'concluido' ? (
-          <section className="cadastro-feedback" role="status">
-            <h2>Conta criada com sucesso</h2>
-            <p>Entre para acessar os recursos da sua conta.</p>
-            <Link className="cadastro-button" to="/login">
-              Ir para login
-            </Link>
-          </section>
-        ) : (
-          <form className="cadastro-form" onSubmit={enviarCadastro}>
-            <label htmlFor="cadastro-nome">Nome</label>
-            <input
-              autoComplete="name"
-              id="cadastro-nome"
-              maxLength={191}
-              name="nome"
-              required
-            />
-            <label htmlFor="cadastro-email">E-mail</label>
-            <input
-              autoComplete="email"
-              id="cadastro-email"
-              maxLength={254}
-              name="email"
-              required
-              type="email"
-            />
-            <label htmlFor="cadastro-username">Nome de usuário</label>
-            <input
-              autoComplete="username"
-              id="cadastro-username"
-              maxLength={191}
-              name="username"
-              required
-            />
-            <label htmlFor="cadastro-senha">Senha</label>
-            <input
-              autoComplete="new-password"
-              id="cadastro-senha"
-              name="senha"
-              required
-              type="password"
-            />
-            {estado.fase === 'falhou' && (
-              <p className="cadastro-error" role="alert">
-                {estado.mensagem}
-              </p>
-            )}
-            {estado.fase === 'enviando' && (
-              <p className="cadastro-loading" role="status" aria-live="polite">
-                Criando conta… A API pode levar até 1 minuto para responder.
-              </p>
-            )}
-            <button
-              className="cadastro-button"
-              disabled={estado.fase === 'enviando'}
-              type="submit"
-            >
-              {estado.fase === 'enviando' ? 'Enviando…' : 'Criar conta'}
-            </button>
-            <p className="cadastro-login-link">
-              Já tem uma conta? <Link to="/login">Entrar</Link>
-            </p>
-          </form>
-        )}
-      </main>
-    </div>
+    <PainelConta
+      arte={witcher}
+      descricao="Cadastre-se para acessar sua conta e consultar suas notas."
+      titulo="Criar conta"
+    >
+      <FormularioCadastro enviar={enviarCadastro} estado={estado} />
+    </PainelConta>
   );
 }

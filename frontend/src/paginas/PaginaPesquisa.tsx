@@ -1,5 +1,12 @@
-import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router';
+import { ArrowUpRight, CircleAlert } from 'lucide-react';
+import { useEffect, useId, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
+import { rotuloMedia, rotuloTotal } from '../catalogo/apresentacao';
+import { CapaJogo } from '../componentes/CapaJogo';
+import { FormularioBusca } from '../componentes/FormularioBusca';
+import { Alert, AlertDescription, AlertTitle } from '../componentes/ui/alert';
+import { Button } from '../componentes/ui/button';
+import { Skeleton } from '../componentes/ui/skeleton';
 import {
   ApiIndisponivelError,
   buscarJogos,
@@ -9,211 +16,158 @@ import {
 import './PaginaPesquisa.css';
 
 type EstadoBusca =
-  | { fase: 'ocioso' }
-  | { fase: 'carregando'; termo: string }
-  | { fase: 'concluido'; termo: string; resultados: JogoResumo[] }
-  | { fase: 'falhou'; termo: string; mensagem: string };
+  | { fase: 'carregando' }
+  | { fase: 'concluido'; resultados: JogoResumo[] }
+  | { fase: 'falhou'; mensagem: string };
 
 function descreverErro(erro: unknown): string {
   if (erro instanceof ErroHttpApi && erro.statusCode === 400) {
     return 'Informe um título para pesquisar.';
   }
   if (erro instanceof ApiIndisponivelError) {
-    return 'Não foi possível carregar os resultados. Verifique a conexão e tente novamente.';
+    return 'Verifique a conexão e tente novamente.';
   }
-  return 'Não foi possível carregar os resultados. Tente novamente.';
+  return 'Não foi possível obter os resultados. Tente novamente.';
 }
 
-function descreverMedia(jogo: JogoResumo): string {
-  if (jogo.mediaAvaliacao === null) return 'Média indisponível';
-  return `Média: ${jogo.mediaAvaliacao.toLocaleString('pt-BR', {
-    maximumFractionDigits: 1,
-    minimumFractionDigits: 1,
-  })}/10`;
+async function consultar(termo: string): Promise<EstadoBusca> {
+  try {
+    const { resultados } = await buscarJogos(termo);
+    return { fase: 'concluido', resultados };
+  } catch (erro: unknown) {
+    return { fase: 'falhou', mensagem: descreverErro(erro) };
+  }
 }
 
-function descreverTotal(total: number): string {
-  return `${total} ${total === 1 ? 'avaliação' : 'avaliações'}`;
-}
-
-function ResultadoJogo({ jogo }: { jogo: JogoResumo }) {
+function ResultadoJogo({ jogo, termo }: { jogo: JogoResumo; termo: string }) {
+  const id = useId();
   return (
-    <li className="pesquisa-resultado">
-      <div className="pesquisa-capa">
-        {jogo.capa ? (
-          <img alt={`Capa de ${jogo.titulo}`} loading="lazy" src={jogo.capa} />
-        ) : (
-          <span aria-label={`Capa indisponível para ${jogo.titulo}`} role="img">
-            Capa indisponível
-          </span>
-        )}
-      </div>
-      <div className="pesquisa-detalhes">
-        <h3>
-          <Link to={`/jogos/${jogo.id}`}>{jogo.titulo}</Link>
-        </h3>
-        <p>
-          {`${descreverMedia(jogo)} · ${descreverTotal(jogo.totalAvaliacoes)}`}
-        </p>
-      </div>
+    <li>
+      <Link
+        aria-describedby={`${id}-nota`}
+        aria-labelledby={id}
+        className="pesquisa-resultado"
+        state={{ termo }}
+        to={`/jogos/${jogo.id}`}
+      >
+        <CapaJogo src={jogo.capa} titulo={jogo.titulo} />
+        <h3 id={id}>{jogo.titulo}</h3>
+        <div className="pesquisa-nota" id={`${id}-nota`}>
+          <strong>
+            {rotuloMedia(jogo.mediaAvaliacao, jogo.totalAvaliacoes)}
+          </strong>
+          <span>{rotuloTotal(jogo.totalAvaliacoes)}</span>
+        </div>
+        <ArrowUpRight aria-hidden="true" size={20} />
+      </Link>
     </li>
   );
 }
 
-function PainelResultados({
+function EstadoResultados({
   estado,
-  tentarNovamente,
+  termo,
+  repetir,
 }: {
   estado: EstadoBusca;
-  tentarNovamente: () => void;
+  termo: string;
+  repetir: () => void;
 }) {
-  if (estado.fase === 'ocioso') {
-    return (
-      <p className="pesquisa-mensagem" role="status">
-        Digite o nome de um jogo para começar a pesquisa.
-      </p>
-    );
-  }
   if (estado.fase === 'carregando') {
     return (
-      <p
-        aria-busy="true"
-        className="pesquisa-mensagem"
-        role="status"
-        aria-live="polite"
-      >
-        Buscando jogos… A API pode levar até 1 minuto para responder após ficar
-        hibernada.
-      </p>
+      <div className="estado-pesquisa">
+        <p role="status">
+          Buscando jogos… A API pode levar até 1 minuto para responder.
+        </p>
+        <Skeleton aria-hidden="true" className="h-20 w-full rounded-lg" />
+      </div>
     );
   }
   if (estado.fase === 'falhou') {
     return (
-      <section className="pesquisa-erro">
-        <p role="alert">{estado.mensagem}</p>
-        <button onClick={tentarNovamente} type="button">
-          Tentar novamente
-        </button>
-      </section>
+      <Alert className="estado-pesquisa">
+        <CircleAlert aria-hidden="true" />
+        <AlertTitle>Não foi possível carregar a pesquisa</AlertTitle>
+        <AlertDescription>
+          <p>{estado.mensagem}</p>
+          <Button onClick={repetir} variant="outline">
+            Tentar novamente
+          </Button>
+        </AlertDescription>
+      </Alert>
     );
   }
-  if (estado.resultados.length === 0) {
+  if (!estado.resultados.length) {
     return (
-      <p className="pesquisa-mensagem" role="status">
-        Nenhum jogo encontrado para “{estado.termo}”. Tente outro título.
+      <p className="estado-pesquisa" role="status">
+        Nenhum jogo encontrado para “{termo}”. Tente outro título.
       </p>
     );
   }
   return (
-    <ul aria-label="Resultados da pesquisa" className="pesquisa-lista">
-      {estado.resultados.map((jogo) => (
-        <ResultadoJogo jogo={jogo} key={jogo.id} />
-      ))}
-    </ul>
+    <section
+      aria-labelledby="titulo-resultados"
+      className="resultados-pesquisa"
+    >
+      <h2 id="titulo-resultados">Resultados para “{termo}”</h2>
+      <ul aria-label="Resultados da pesquisa">
+        {estado.resultados.map((jogo) => (
+          <ResultadoJogo jogo={jogo} key={jogo.id} termo={termo} />
+        ))}
+      </ul>
+    </section>
   );
 }
 
-interface TelaPesquisaProps {
-  termo: string;
-  estado: EstadoBusca;
-  enviarBusca: (evento: FormEvent<HTMLFormElement>) => void;
-  alterarTermo: (termo: string) => void;
-  tentarNovamente: () => void;
-}
+function ConsultaPesquisa({ termo }: { termo: string }) {
+  const [estado, setEstado] = useState<EstadoBusca>({ fase: 'carregando' });
+  const [tentativa, setTentativa] = useState(0);
 
-function TelaPesquisa({
-  termo,
-  estado,
-  enviarBusca,
-  alterarTermo,
-  tentarNovamente,
-}: TelaPesquisaProps) {
+  useEffect(() => {
+    let ativo = true;
+    queueMicrotask(() => {
+      if (ativo)
+        void consultar(termo).then((resposta) => {
+          if (ativo) setEstado(resposta);
+        });
+    });
+    return () => {
+      ativo = false;
+    };
+  }, [termo, tentativa]);
+
+  function repetir() {
+    setEstado({ fase: 'carregando' });
+    setTentativa((valor) => valor + 1);
+  }
+
   return (
-    <div className="pesquisa-page">
-      <header className="pesquisa-header">
-        <Link className="pesquisa-brand" to="/pesquisa">
-          VORGAME
-        </Link>
-        <nav aria-label="Navegação principal">
-          <Link aria-current="page" to="/pesquisa">
-            Pesquisar jogos
-          </Link>
-          <Link to="/login">Entrar</Link>
-          <Link to="/cadastro">Criar conta</Link>
-        </nav>
-      </header>
-      <main className="pesquisa-main">
-        <p className="pesquisa-eyebrow">Descubra seu próximo jogo</p>
-        <h1>Pesquisar jogos</h1>
-        <form className="pesquisa-form" onSubmit={enviarBusca} role="search">
-          <div>
-            <label htmlFor="pesquisa-termo">Nome do jogo</label>
-            <input
-              autoComplete="off"
-              id="pesquisa-termo"
-              name="q"
-              onChange={(evento) => alterarTermo(evento.currentTarget.value)}
-              required
-              value={termo}
-            />
-          </div>
-          <button
-            disabled={estado.fase === 'carregando'}
-            type="submit"
-          >
-            {estado.fase === 'carregando' ? 'Pesquisando…' : 'Pesquisar'}
-          </button>
-        </form>
-        <section aria-label="Jogos encontrados" className="pesquisa-conteudo">
-          <PainelResultados
-            estado={estado}
-            tentarNovamente={tentarNovamente}
-          />
-        </section>
-      </main>
-    </div>
+    <>
+      <FormularioBusca
+        aoRepetir={repetir}
+        carregando={estado.fase === 'carregando'}
+        termo={termo}
+      />
+      <EstadoResultados estado={estado} repetir={repetir} termo={termo} />
+    </>
   );
 }
 
 export function PaginaPesquisa() {
-  const [termo, setTermo] = useState('');
-  const [estado, setEstado] = useState<EstadoBusca>({ fase: 'ocioso' });
-
-  async function executarBusca(consulta: string) {
-    setEstado({ fase: 'carregando', termo: consulta });
-    try {
-      const resposta = await buscarJogos(consulta);
-      setEstado({
-        fase: 'concluido',
-        termo: consulta,
-        resultados: resposta.resultados,
-      });
-    } catch (erro: unknown) {
-      setEstado({
-        fase: 'falhou',
-        termo: consulta,
-        mensagem: descreverErro(erro),
-      });
-    }
-  }
-
-  function enviarBusca(evento: FormEvent<HTMLFormElement>) {
-    evento.preventDefault();
-    const consulta = termo.trim();
-    if (consulta) void executarBusca(consulta);
-  }
-
-  function tentarNovamente() {
-    if (estado.fase === 'falhou') void executarBusca(estado.termo);
-  }
+  const [parametros] = useSearchParams();
+  const termo = parametros.get('q')?.trim() ?? '';
 
   return (
-    <TelaPesquisa
-      alterarTermo={setTermo}
-      enviarBusca={enviarBusca}
-      estado={estado}
-      tentarNovamente={tentarNovamente}
-      termo={termo}
-    />
+    <main className="limite pagina pagina-pesquisa">
+      <h1>Pesquisar jogos</h1>
+      <p className="introducao">
+        Encontre um título e compare as notas da comunidade.
+      </p>
+      {termo ? (
+        <ConsultaPesquisa key={termo} termo={termo} />
+      ) : (
+        <FormularioBusca />
+      )}
+    </main>
   );
 }

@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-28T01:40:29.142Z",
+  "title": "Sistema visual do Vorgame",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Azul-gelo",
+        "tonalRamp": [
+          "oklch(15% 0.0750 234.95)",
+          "oklch(26% 0.0750 234.95)",
+          "oklch(38% 0.0750 234.95)",
+          "oklch(49% 0.0750 234.95)",
+          "oklch(61% 0.0750 234.95)",
+          "oklch(72% 0.0750 234.95)",
+          "oklch(84% 0.0750 234.95)",
+          "oklch(95% 0.0750 234.95)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Azul-petróleo escuro",
+        "tonalRamp": [
+          "oklch(15% 0.0451 247.77)",
+          "oklch(26% 0.0451 247.77)",
+          "oklch(38% 0.0451 247.77)",
+          "oklch(49% 0.0451 247.77)",
+          "oklch(61% 0.0451 247.77)",
+          "oklch(72% 0.0451 247.77)",
+          "oklch(84% 0.0451 247.77)",
+          "oklch(95% 0.0451 247.77)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Azul-noite",
+        "tonalRamp": [
+          "oklch(15% 0.0225 260.44)",
+          "oklch(26% 0.0225 260.44)",
+          "oklch(38% 0.0225 260.44)",
+          "oklch(49% 0.0225 260.44)",
+          "oklch(61% 0.0225 260.44)",
+          "oklch(72% 0.0225 260.44)",
+          "oklch(84% 0.0225 260.44)",
+          "oklch(95% 0.0225 260.44)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Azul-ardósia",
+        "tonalRamp": [
+          "oklch(15% 0.0278 259.95)",
+          "oklch(26% 0.0278 259.95)",
+          "oklch(38% 0.0278 259.95)",
+          "oklch(49% 0.0278 259.95)",
+          "oklch(61% 0.0278 259.95)",
+          "oklch(72% 0.0278 259.95)",
+          "oklch(84% 0.0278 259.95)",
+          "oklch(95% 0.0278 259.95)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Azul-ardósia claro",
+        "tonalRamp": [
+          "oklch(15% 0.0344 254.00)",
+          "oklch(26% 0.0344 254.00)",
+          "oklch(38% 0.0344 254.00)",
+          "oklch(49% 0.0344 254.00)",
+          "oklch(61% 0.0344 254.00)",
+          "oklch(72% 0.0344 254.00)",
+          "oklch(84% 0.0344 254.00)",
+          "oklch(95% 0.0344 254.00)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Quase branco",
+        "tonalRamp": [
+          "oklch(15% 0.0091 258.34)",
+          "oklch(26% 0.0091 258.34)",
+          "oklch(38% 0.0091 258.34)",
+          "oklch(49% 0.0091 258.34)",
+          "oklch(61% 0.0091 258.34)",
+          "oklch(72% 0.0091 258.34)",
+          "oklch(84% 0.0091 258.34)",
+          "oklch(95% 0.0091 258.34)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Cinza azulado",
+        "tonalRamp": [
+          "oklch(15% 0.0293 256.50)",
+          "oklch(26% 0.0293 256.50)",
+          "oklch(38% 0.0293 256.50)",
+          "oklch(49% 0.0293 256.50)",
+          "oklch(61% 0.0293 256.50)",
+          "oklch(72% 0.0293 256.50)",
+          "oklch(84% 0.0293 256.50)",
+          "oklch(95% 0.0293 256.50)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Contorno azul-ardósia",
+        "tonalRamp": [
+          "oklch(15% 0.0338 257.10)",
+          "oklch(26% 0.0338 257.10)",
+          "oklch(38% 0.0338 257.10)",
+          "oklch(49% 0.0338 257.10)",
+          "oklch(61% 0.0338 257.10)",
+          "oklch(72% 0.0338 257.10)",
+          "oklch(84% 0.0338 257.10)",
+          "oklch(95% 0.0338 257.10)"
+        ]
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Contorno de campo",
+        "tonalRamp": [
+          "oklch(15% 0.0391 252.46)",
+          "oklch(26% 0.0391 252.46)",
+          "oklch(38% 0.0391 252.46)",
+          "oklch(49% 0.0391 252.46)",
+          "oklch(61% 0.0391 252.46)",
+          "oklch(72% 0.0391 252.46)",
+          "oklch(84% 0.0391 252.46)",
+          "oklch(95% 0.0391 252.46)"
+        ]
+      },
+      "destructive": {
+        "role": "error",
+        "displayName": "Rosa claro",
+        "tonalRamp": [
+          "oklch(15% 0.0877 15.57)",
+          "oklch(26% 0.0877 15.57)",
+          "oklch(38% 0.0877 15.57)",
+          "oklch(49% 0.0877 15.57)",
+          "oklch(61% 0.0877 15.57)",
+          "oklch(72% 0.0877 15.57)",
+          "oklch(84% 0.0877 15.57)",
+          "oklch(95% 0.0877 15.57)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Abertura",
+        "purpose": "Título da abertura do catálogo."
+      },
+      "headline": {
+        "displayName": "Página",
+        "purpose": "Títulos de páginas internas."
+      },
+      "title": {
+        "displayName": "Seção",
+        "purpose": "Títulos das seções da home."
+      },
+      "body": {
+        "displayName": "Corpo",
+        "purpose": "Texto de leitura e descrições."
+      },
+      "label": {
+        "displayName": "Rótulo",
+        "purpose": "Navegação do catálogo e rótulos dos campos de conta."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-xs",
+        "value": "0 1px 2px 0 #0000000d",
+        "purpose": "Sombra curta para campos e botões contornados."
+      },
+      {
+        "name": "shadow-sm",
+        "value": "0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a",
+        "purpose": "Sombra do cartão-base."
+      },
+      {
+        "name": "shadow-lg",
+        "value": "0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a",
+        "purpose": "Sombra do painel do menu lateral."
+      }
+    ],
+    "motion": [
+      {
+        "name": "controle",
+        "value": "150ms cubic-bezier(.4, 0, .2, 1)",
+        "purpose": "Transição padrão de estados dos controles."
+      },
+      {
+        "name": "movimento-curto",
+        "value": "160ms ease-out",
+        "purpose": "Mudança de cor, fundo e contorno na navegação e nas ações de catálogo."
+      },
+      {
+        "name": "movimento-medio",
+        "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Ampliação de capa e movimento de seta no foco ou hover."
+      },
+      {
+        "name": "movimento-cena",
+        "value": "620ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Entrada única da imagem de abertura com recorte, escala e opacidade."
+      },
+      {
+        "name": "menu-abrir",
+        "value": "500ms",
+        "purpose": "Duração da animação de entrada do menu lateral."
+      },
+      {
+        "name": "menu-fechar",
+        "value": "300ms",
+        "purpose": "Duração da animação de saída do menu lateral."
+      },
+      {
+        "name": "movimento-reduzido",
+        "value": "0.01ms",
+        "purpose": "Duração aplicada globalmente quando a pessoa prefere movimento reduzido."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "rodape-compacto",
+        "value": "24rem"
+      },
+      {
+        "name": "catalogo-compacto",
+        "value": "37rem"
+      },
+      {
+        "name": "navegacao-e-conta",
+        "value": "44rem"
+      },
+      {
+        "name": "curadoria",
+        "value": "48rem"
+      },
+      {
+        "name": "abertura",
+        "value": "56rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal da tela.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\">Criar conta</button>",
+      "css": ".ds-button-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 2.25rem; padding: 0.5rem 1rem; border: none; border-radius: var(--radius-md, calc(var(--radius, 0.75rem) - 2px)); background: var(--primary, #a4ddff); color: var(--primary-foreground, #102538); font: 500 0.875rem/1.25rem var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); box-shadow: none; cursor: pointer; transition: all 150ms cubic-bezier(.4, 0, .2, 1); }\n.ds-button-primary:hover { background: color-mix(in oklab, var(--primary, #a4ddff) 90%, transparent); }\n.ds-button-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary, #a4ddff) 50%, transparent); }\n.ds-button-primary:disabled { opacity: 0.5; pointer-events: none; }\n@media (prefers-reduced-motion: reduce) { .ds-button-primary { transition-duration: 0.01ms; } }"
+    },
+    {
+      "name": "Botão contornado",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Ação secundária com contorno.",
+      "html": "<button class=\"ds-button-outline\" type=\"button\">Tentar novamente</button>",
+      "css": ".ds-button-outline { display: inline-flex; align-items: center; justify-content: center; min-height: 2.25rem; padding: 0.5rem 1rem; border: 1px solid currentColor; border-radius: var(--radius-md, calc(var(--radius, 0.75rem) - 2px)); background: var(--background, #0e141e); color: var(--foreground, #f0f4fa); font: 500 0.875rem/1.25rem var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); box-shadow: 0 1px 2px 0 #0000000d; cursor: pointer; transition: all 150ms cubic-bezier(.4, 0, .2, 1); }\n.ds-button-outline:hover { background: var(--secondary, #202d3d); }\n.ds-button-outline:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary, #a4ddff) 50%, transparent); }\n.ds-button-outline:disabled { opacity: 0.5; pointer-events: none; }\n@media (prefers-reduced-motion: reduce) { .ds-button-outline { transition-duration: 0.01ms; } }"
+    },
+    {
+      "name": "Botão fantasma",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acesso à conta na navegação de desktop.",
+      "html": "<button class=\"ds-button-ghost\" type=\"button\">Entrar</button>",
+      "css": ".ds-button-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 2.25rem; padding: 0.5rem 1rem; border: none; border-radius: var(--radius-md, calc(var(--radius, 0.75rem) - 2px)); background: transparent; color: var(--foreground, #f0f4fa); font: 500 0.875rem/1.25rem var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); box-shadow: none; cursor: pointer; transition: all 150ms cubic-bezier(.4, 0, .2, 1); }\n.ds-button-ghost:hover { background: var(--secondary, #202d3d); }\n.ds-button-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary, #a4ddff) 50%, transparent); }\n.ds-button-ghost:disabled { opacity: 0.5; pointer-events: none; }\n@media (prefers-reduced-motion: reduce) { .ds-button-ghost { transition-duration: 0.01ms; } }"
+    },
+    {
+      "name": "Campo de conta",
+      "kind": "input",
+      "refersTo": "input-conta",
+      "description": "Rótulo acima do controle e anel de foco azul-gelo.",
+      "html": "<label class=\"ds-input-label\"><span>Nome de usuário</span><input type=\"text\" autocomplete=\"username\"></label>",
+      "css": ".ds-input-label { display: grid; gap: 0.35rem; color: var(--foreground, #f0f4fa); font: 650 0.93rem/1.55 var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); }\n.ds-input-label input { box-sizing: border-box; width: 100%; min-height: 2.9rem; padding: 0.25rem 0.75rem; border: 1px solid var(--input, #64768b); border-radius: var(--radius-md, calc(var(--radius, 0.75rem) - 2px)); background: var(--background, #0e141e); color: var(--foreground, #f0f4fa); caret-color: var(--primary, #a4ddff); font: 400 1rem/1.55 var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); box-shadow: 0 1px 2px 0 #0000000d; transition: color 150ms cubic-bezier(.4, 0, .2, 1), box-shadow 150ms cubic-bezier(.4, 0, .2, 1); }\n.ds-input-label input:focus-visible { border-color: var(--primary, #a4ddff); outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary, #a4ddff) 50%, transparent); }\n.ds-input-label input[aria-invalid=\"true\"] { border-color: var(--destructive, #ffb4b8); }\n.ds-input-label input:disabled { cursor: not-allowed; opacity: 0.5; }\n@media (prefers-reduced-motion: reduce) { .ds-input-label input { transition-duration: 0.01ms; } }"
+    },
+    {
+      "name": "Navegação do catálogo",
+      "kind": "nav",
+      "refersTo": "nav-catalogo",
+      "description": "O link atual tem cor de ação e uma linha na base.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navegação principal\"><a href=\"/\" aria-current=\"page\">Explorar</a><a href=\"/pesquisa\">Pesquisar jogos</a></nav>",
+      "css": ".ds-nav { display: flex; flex-wrap: wrap; gap: 0 1.5rem; align-items: center; padding-inline: 0.75rem; border-bottom: 1px solid var(--border, #303c4d); background: var(--background, #0e141e); color: var(--muted-foreground, #b1bed0); font: 650 0.93rem/1.55 var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); }\n.ds-nav a { position: relative; display: inline-flex; min-height: 4.5rem; align-items: center; color: inherit; text-decoration: none; }\n.ds-nav a:hover, .ds-nav [aria-current=\"page\"] { color: var(--primary, #a4ddff); }\n.ds-nav a:focus-visible { outline: 2px solid var(--primary, #a4ddff); outline-offset: 3px; }\n.ds-nav [aria-current=\"page\"]::after { position: absolute; inset: auto 0 -1px; height: 2px; content: \"\"; background: var(--primary, #a4ddff); }"
+    },
+    {
+      "name": "Atalho por estilo",
+      "kind": "chip",
+      "refersTo": "atalho-estilo",
+      "description": "Link contornado com ícone e texto que leva à seção correspondente.",
+      "html": "<a class=\"ds-estilo\" href=\"#estilo-exploracao\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z\"/></svg>Exploração</a>",
+      "css": ".ds-estilo { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.5rem; padding-inline: 0.625rem; border: 1px solid currentColor; border-radius: var(--radius-md, calc(var(--radius, 0.75rem) - 2px)); background: var(--background, #0e141e); color: var(--foreground, #f0f4fa); font: 500 0.875rem/1.25rem var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); text-decoration: none; box-shadow: 0 1px 2px 0 #0000000d; transition: all 150ms cubic-bezier(.4, 0, .2, 1); }\n.ds-estilo:hover { background: var(--secondary, #202d3d); }\n.ds-estilo:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary, #a4ddff) 50%, transparent); }\n@media (prefers-reduced-motion: reduce) { .ds-estilo { transition-duration: 0.01ms; } }"
+    },
+    {
+      "name": "Painel de nota",
+      "kind": "card",
+      "refersTo": "card-nota",
+      "description": "Painel compacto para mostrar a média da comunidade ou o estado da avaliação.",
+      "html": "<section class=\"ds-nota\"><h2><svg viewBox=\"0 0 24 24\" width=\"21\" height=\"21\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.68a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.64a2.123 2.123 0 0 0-.61 1.88l.882 5.143a.53.53 0 0 1-.771.56l-4.618-2.43a2.123 2.123 0 0 0-1.974 0l-4.618 2.43a.53.53 0 0 1-.77-.56l.881-5.142a2.123 2.123 0 0 0-.61-1.88L2.16 9.795a.53.53 0 0 1 .294-.904l5.165-.756a2.123 2.123 0 0 0 1.597-1.16z\"/></svg>Média da comunidade</h2><p><strong>8,4/10</strong></p><p>12 avaliações</p></section>",
+      "css": ".ds-nota { display: flex; flex-direction: column; align-items: start; gap: 0.6rem; padding: clamp(1rem, 3vw, 1.55rem); border: 1px solid var(--border, #303c4d); border-radius: var(--radius-xl, calc(var(--radius, 0.75rem) + 4px)); background: var(--card, #171f2c); color: var(--foreground, #f0f4fa); font: 400 1rem/1.55 var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); }\n.ds-nota h2 { display: flex; gap: 0.55rem; align-items: center; margin: 0; font: 700 clamp(1.45rem, 3.25vw, 2rem)/1.08 var(--fonte-titulo, \"Barlow Condensed\", \"Arial Narrow\", sans-serif); letter-spacing: -0.015em; }\n.ds-nota svg { flex: none; color: var(--primary, #a4ddff); }\n.ds-nota p { margin: 0; color: var(--muted-foreground, #b1bed0); }\n.ds-nota strong { color: var(--foreground, #f0f4fa); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Alerta de erro",
+      "kind": "custom",
+      "refersTo": "alerta-erro",
+      "description": "Mensagem de erro legível junto ao formulário.",
+      "html": "<div class=\"ds-alerta\" role=\"alert\">Não foi possível iniciar a sessão. Tente novamente.</div>",
+      "css": ".ds-alerta { padding: 0.75rem 1rem; border: 1px solid var(--border, #303c4d); border-radius: var(--radius, 0.75rem); background: var(--card, #171f2c); color: color-mix(in oklab, var(--destructive, #ffb4b8) 90%, transparent); font: 400 0.875rem/1.25rem var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); }"
+    },
+    {
+      "name": "Jogo em destaque",
+      "kind": "card",
+      "refersTo": "destaque-jogo",
+      "description": "Acesso ao jogo em destaque na abertura do catálogo.",
+      "html": "<a class=\"ds-destaque\" href=\"/pesquisa\"><div><strong>Jogo em destaque</strong><p>Veja a ficha no catálogo.</p></div><span><svg viewBox=\"0 0 24 24\" width=\"23\" height=\"23\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 7h10v10\"/><path d=\"M7 17 17 7\"/></svg></span></a>",
+      "css": ".ds-destaque { display: flex; max-width: 24rem; align-items: center; justify-content: space-between; gap: 1.2rem; padding: 0.9rem 1.05rem; border: 1px solid #54687a; border-radius: var(--radius, 0.75rem); background: #162333; color: var(--foreground, #f0f4fa); text-decoration: none; transition: background 180ms ease-out, border-color 180ms ease-out; }\n.ds-destaque:hover, .ds-destaque:focus-visible { border-color: var(--primary, #a4ddff); background: var(--secondary, #202d3d); }\n.ds-destaque:focus-visible { outline: 2px solid var(--primary, #a4ddff); outline-offset: 3px; }\n.ds-destaque strong { font: 700 clamp(1.65rem, 3vw, 2.3rem)/1 var(--fonte-titulo, \"Barlow Condensed\", \"Arial Narrow\", sans-serif); }\n.ds-destaque p { margin: 0.35rem 0 0; color: var(--muted-foreground, #b1bed0); font: 400 0.875rem/1.55 var(--fonte-texto, \"DM Sans\", system-ui, sans-serif); }\n.ds-destaque span { display: grid; width: 2.5rem; height: 2.5rem; flex: 0 0 2.5rem; place-items: center; border: 1px solid #54687a; border-radius: 50%; color: var(--primary, #a4ddff); }\n@media (prefers-reduced-motion: reduce) { .ds-destaque { transition-duration: 0.01ms; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Catálogo em azul-noite",
+    "overview": "O site combina títulos condensados, superfícies azul-noite e imagens de jogos reais. O azul-gelo marca pontos de interação e ajuda a localizar a busca, os links e a seção ativa.\n\nA descoberta usa capa, título e uma descrição curta do jogo. Na pesquisa e nas fichas, os painéis compactos dão espaço aos nomes, às informações do catálogo e às notas disponíveis.",
+    "keyCharacteristics": [
+      "Barlow Condensed para títulos e DM Sans para leitura e controles.",
+      "Contraste tonal, contornos finos e azul-gelo para ações e foco.",
+      "Arte de jogos reais na abertura, nos blocos por estilo e nas telas de conta."
+    ],
+    "rules": [],
+    "dos": [
+      "**Use** a paleta de superfícies, contornos e foco do CSS global nos componentes novos.",
+      "**Use** imagens dos jogos com autoria, licença e origem registradas.",
+      "**Use** texto para comunicar carregamento, ausência de resultados e falhas recuperáveis."
+    ],
+    "donts": [
+      "**Evite** usar apenas cor para indicar página ativa, erro ou foco."
+    ]
+  }
+}

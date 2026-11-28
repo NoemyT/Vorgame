@@ -1,12 +1,16 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
+import { cyberpunk } from '../catalogo/curadoria';
+import { CampoSenha, PainelConta } from '../componentes/PainelConta';
+import { Alert, AlertDescription } from '../componentes/ui/alert';
+import { Button } from '../componentes/ui/button';
+import { Input } from '../componentes/ui/input';
 import {
   ApiIndisponivelError,
   ErroHttpApi,
   iniciarSessao,
 } from '../servicos/api';
 import { salvarToken } from '../servicos/sessao';
-import './PaginaLogin.css';
 
 type EstadoLogin =
   | { fase: 'ocioso' }
@@ -40,47 +44,47 @@ interface FormularioLoginProps {
 function FormularioLogin({ estado, enviar }: FormularioLoginProps) {
   if (estado.fase === 'concluido') {
     return (
-      <section className="login-feedback" role="status">
+      <section className="conta-feedback" role="status">
         <h2>Sessão iniciada</h2>
         <p>Olá, {estado.nome}. Sua conta está autenticada.</p>
-        <p>Você poderá avaliar jogos enquanto esta sessão estiver ativa.</p>
+        <Button asChild>
+          <Link to="/pesquisa">Pesquisar jogos</Link>
+        </Button>
       </section>
     );
   }
 
   const enviando = estado.fase === 'enviando';
   return (
-    <form className="login-form" onSubmit={enviar}>
-      <label htmlFor="login-identificador">E-mail ou nome de usuário</label>
-      <input
-        autoComplete="username"
-        id="login-identificador"
-        name="login"
-        required
-      />
-      <label htmlFor="login-senha">Senha</label>
-      <input
-        autoComplete="current-password"
-        id="login-senha"
-        name="senha"
-        required
-        type="password"
-      />
+    <form className="conta-form" onSubmit={enviar}>
+      <div className="conta-campo">
+        <label htmlFor="login-identificador">E-mail ou nome de usuário</label>
+        <Input
+          autoComplete="username"
+          id="login-identificador"
+          name="login"
+          required
+        />
+      </div>
+      <CampoSenha autoComplete="current-password" id="login-senha" />
       {estado.fase === 'falhou' && (
-        <p className="login-error" role="alert">
-          {estado.mensagem}
-        </p>
+        <Alert variant="destructive">
+          <AlertDescription>{estado.mensagem}</AlertDescription>
+        </Alert>
       )}
       {enviando && (
-        <p className="login-loading" role="status" aria-live="polite">
+        <p role="status">
           Entrando… A API pode levar até 1 minuto para responder.
         </p>
       )}
-      <button className="login-button" disabled={enviando} type="submit">
+      <Button disabled={enviando} type="submit">
         {enviando ? 'Entrando…' : 'Entrar'}
-      </button>
-      <p className="login-register-link">
-        Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
+      </Button>
+      <p className="conta-alternativa">
+        Ainda não tem conta?{' '}
+        <Link className="link-texto" to="/cadastro">
+          Criar conta
+        </Link>
       </p>
     </form>
   );
@@ -106,24 +110,12 @@ export function PaginaLogin() {
   }
 
   return (
-    <div className="login-page">
-      <header className="login-header">
-        <Link className="login-brand" to="/">
-          VORGAME
-        </Link>
-        <nav aria-label="Navegação principal">
-          <Link to="/pesquisa">Pesquisar jogos</Link>
-          <Link to="/cadastro">Criar conta</Link>
-        </nav>
-      </header>
-      <main className="login-main">
-        <p className="login-eyebrow">Bem-vindo de volta</p>
-        <h1>Entrar</h1>
-        <p className="login-intro">
-          Acesse sua conta para continuar no Vorgame.
-        </p>
-        <FormularioLogin estado={estado} enviar={enviarLogin} />
-      </main>
-    </div>
+    <PainelConta
+      arte={cyberpunk}
+      descricao="Acesse sua conta para consultar suas notas nas fichas dos jogos."
+      titulo="Entrar"
+    >
+      <FormularioLogin estado={estado} enviar={enviarLogin} />
+    </PainelConta>
   );
 }

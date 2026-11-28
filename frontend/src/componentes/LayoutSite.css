@@ -1,0 +1,268 @@
+.layout-site {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.layout-conteudo {
+  flex: 1;
+}
+
+.layout-conteudo:focus {
+  outline: none;
+}
+
+.atalho-conteudo {
+  position: fixed;
+  z-index: 60;
+  inset: 0.65rem auto auto 0.65rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.4rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 700;
+}
+
+.atalho-conteudo:not(:focus) {
+  clip-path: inset(50%);
+}
+
+.cabecalho-site {
+  position: sticky;
+  z-index: 30;
+  top: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+}
+
+.cabecalho-interno,
+.cabecalho-desktop,
+.nav-catalogo,
+.nav-conta,
+.cabecalho-movel {
+  display: flex;
+  align-items: center;
+}
+
+.cabecalho-interno {
+  min-height: 4.5rem;
+  justify-content: space-between;
+  gap: clamp(1.2rem, 5vw, 4rem);
+}
+
+.cabecalho-desktop {
+  flex: 1;
+  justify-content: space-between;
+}
+
+.marca-vorgame {
+  display: inline-flex;
+  min-height: 2.75rem;
+  width: max-content;
+  align-items: center;
+  gap: 0.55rem;
+  font: 700 2rem/1 var(--fonte-titulo);
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+.marca-vorgame img {
+  flex: none;
+  object-fit: contain;
+}
+
+.nav-catalogo {
+  gap: 1.5rem;
+  color: var(--muted-foreground);
+  font-weight: 650;
+  font-size: 0.93rem;
+}
+
+.nav-catalogo a {
+  position: relative;
+  display: inline-flex;
+  min-height: 4.5rem;
+  align-items: center;
+  transition: color var(--movimento-curto) ease-out;
+}
+
+.nav-catalogo a:hover,
+.nav-catalogo [aria-current='page'],
+.nav-conta [aria-current='page'][data-variant='ghost'] {
+  color: var(--primary);
+}
+
+.nav-catalogo [aria-current='page']::after {
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  content: '';
+  background: var(--primary);
+}
+
+.nav-conta {
+  gap: 0.45rem;
+}
+
+.nav-conta a {
+  min-height: 2.5rem;
+}
+
+.sessao-site {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.sessao-site svg {
+  color: var(--primary);
+}
+
+.cabecalho-movel {
+  display: none;
+  gap: 0.35rem;
+}
+
+.cabecalho-movel a,
+.cabecalho-movel button,
+.menu-vorgame [data-slot='sheet-dismiss'] {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.menu-vorgame {
+  max-width: min(23rem, 90vw);
+  background: var(--card);
+}
+
+.menu-vorgame [data-slot='sheet-title'] {
+  font-size: 2rem;
+}
+
+.menu-vorgame [data-slot='sheet-dismiss'] {
+  display: grid;
+  place-items: center;
+}
+
+.menu-vorgame nav,
+.menu-conta {
+  display: grid;
+  padding-inline: 1rem;
+}
+
+.menu-vorgame nav a {
+  display: flex;
+  min-height: 3rem;
+  align-items: center;
+  gap: 0.7rem;
+  padding-inline: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.menu-vorgame nav a[aria-current='page'] {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.menu-conta {
+  gap: 0.65rem;
+  padding-block: 1rem;
+}
+
+.menu-conta a {
+  min-height: 2.75rem;
+}
+
+.rodape-site {
+  border-top: 1px solid var(--border);
+  background: #0b121b;
+  color: var(--muted-foreground);
+}
+
+.rodape-grade {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) minmax(0, 1.8fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  padding-block: 2.25rem;
+}
+
+.rodape-marca .marca-vorgame {
+  color: var(--foreground);
+}
+
+.rodape-marca p {
+  max-width: 33ch;
+  margin-top: 0.6rem;
+}
+
+.rodape-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.rodape-links div {
+  display: grid;
+  align-content: start;
+}
+
+.rodape-links h2 {
+  margin-bottom: 0.35rem;
+  color: var(--foreground);
+  font: 700 0.95rem/1.4 var(--fonte-texto);
+}
+
+.rodape-links a {
+  width: fit-content;
+  min-height: 2rem;
+  padding-block: 0.22rem;
+  font-size: 0.88rem;
+}
+
+.rodape-links a:hover,
+.rodape-base a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.rodape-base {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem 1.25rem;
+  padding-block: 0.85rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.83rem;
+}
+
+.rodape-base a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+@media (max-width: 44rem) {
+  .cabecalho-interno {
+    min-height: 3.8rem;
+  }
+
+  .cabecalho-desktop {
+    display: none;
+  }
+
+  .cabecalho-movel {
+    display: flex;
+  }
+
+  .rodape-grade {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 24rem) {
+  .rodape-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

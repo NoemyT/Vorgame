@@ -1,231 +1,141 @@
-.detalhes-page {
-  min-height: 100vh;
-  background: #0b0f17;
-  color: #e8edf5;
-  font-family:
-    Inter, 'Segoe UI Variable', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.detalhes-page * {
-  box-sizing: border-box;
-}
-
-.detalhes-page a {
-  color: inherit;
-}
-
-.detalhes-page a:hover {
-  color: #6ea6ff;
-}
-
-.detalhes-page a:focus-visible,
-.detalhes-page button:focus-visible {
-  outline: 3px solid #78aaff;
-  outline-offset: 3px;
-}
-
-.detalhes-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem max(1.25rem, calc((100% - 72rem) / 2));
-  background: #0c111b;
-  box-shadow: 0 8px 28px rgb(0 0 0 / 20%);
-}
-
-.detalhes-brand {
-  font-size: 1.15rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-}
-
-.detalhes-header nav {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.detalhes-header nav a {
-  color: #8ab8ff;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.detalhes-header nav span {
-  color: #a0adbf;
-}
-
-.detalhes-main {
-  width: min(100% - 2rem, 72rem);
-  margin: clamp(1.5rem, 5vh, 3rem) auto;
+.pagina.pagina-detalhes {
+  max-width: 69rem;
+  padding-top: clamp(1.3rem, 4vw, 3rem);
 }
 
 .detalhes-voltar {
-  margin: 0 0 1rem;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
-.detalhes-voltar a {
-  color: #8ab8ff;
-  text-underline-offset: 0.2em;
+.detalhes-voltar:hover {
+  text-decoration: underline;
 }
 
 .detalhes-jogo {
   display: grid;
-  grid-template-columns: minmax(12rem, 18rem) 1fr;
-  gap: 1.5rem;
+  grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
+  gap: clamp(1.25rem, 4vw, 3.5rem);
+  align-items: start;
 }
 
-.detalhes-capa {
-  display: grid;
-  min-height: 22rem;
-  place-items: center;
-  overflow: hidden;
-  border-radius: 0.65rem;
-  background: linear-gradient(145deg, #1a2636, #25364b);
-  color: #d8e3f2;
-  text-align: center;
-}
-
-.detalhes-capa img {
-  width: 100%;
-  height: 100%;
-  min-height: 22rem;
-  object-fit: cover;
-}
-
-.detalhes-conteudo,
-.detalhes-avaliacao,
-.detalhes-mensagem,
-.detalhes-erro {
-  padding: clamp(1.25rem, 4vw, 1.75rem);
-  border-radius: 0.65rem;
-  background: #121a27;
-  box-shadow: 0 12px 32px rgb(0 0 0 / 20%);
-}
-
-.detalhes-conteudo h1 {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 720;
-  letter-spacing: -0.045em;
-  line-height: 1.1;
+.detalhes-jogo .capa-jogo {
+  border-radius: var(--radius);
 }
 
 .detalhes-descricao {
-  margin: 1rem 0 1.5rem;
-  color: #c1ccda;
+  max-width: 70ch;
+  margin-block: 0.85rem 1.3rem;
+  color: var(--muted-foreground);
   white-space: pre-line;
 }
 
 .detalhes-metadados {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 2rem;
-  margin: 0;
+  display: grid;
+  gap: 0.65rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 
 .detalhes-metadados div {
-  min-width: min(100%, 12rem);
+  display: grid;
+  grid-template-columns: 6.25rem minmax(0, 1fr);
+  gap: 0.25rem 0.7rem;
 }
 
 .detalhes-metadados dt {
-  color: #a0adbf;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .detalhes-metadados dd {
-  margin: 0.15rem 0 0;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
 }
 
-.detalhes-media {
-  margin: 1.5rem 0 0;
-  color: #c1ccda;
+.detalhes-notas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 2rem;
 }
 
-.detalhes-media strong {
-  color: #e8edf5;
-}
-
-.detalhes-avaliacao {
-  margin-top: 1rem;
-}
-
-.detalhes-avaliacao h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
-}
-
-.detalhes-avaliacao p {
-  margin: 0.5rem 0;
-  color: #c1ccda;
-}
-
-.detalhes-avaliacao a {
-  display: inline-block;
-  margin-top: 0.4rem;
-  color: #8ab8ff;
-  font-weight: 600;
-  text-underline-offset: 0.2em;
-}
-
-.detalhes-mensagem {
-  color: #a0adbf;
-}
-
-.detalhes-erro {
-  background: #29171e;
-  color: #ffb8c0;
+.detalhes-painel[data-slot='card'] {
+  height: 100%;
+  align-items: start;
+  gap: 0.6rem;
+  padding: clamp(1rem, 3vw, 1.55rem);
   box-shadow: none;
 }
 
-.detalhes-erro p {
-  margin-top: 0;
+.detalhes-painel h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: clamp(1.45rem, 3.25vw, 2rem);
 }
 
-.detalhes-erro a {
-  color: #ffb8c0;
+.detalhes-painel h2 svg {
+  flex: none;
+  color: var(--primary);
 }
 
-.detalhes-erro button,
-.detalhes-avaliacao button {
-  min-height: 2.9rem;
-  margin-top: 0.5rem;
-  padding: 0.7rem 1.2rem;
-  border: 0;
-  border-radius: 0.4rem;
-  background: #2868c7;
-  color: #fff;
-  font: inherit;
-  font-weight: 650;
-  cursor: pointer;
+.detalhes-painel p {
+  color: var(--muted-foreground);
 }
 
-.detalhes-erro button:hover,
-.detalhes-avaliacao button:hover {
-  background: #4389f5;
+.detalhes-painel .detalhes-valor {
+  color: var(--foreground);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 44rem) {
-  .detalhes-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding-inline: 1rem;
+.formulario-avaliacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.formulario-avaliacao > div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.formulario-avaliacao select {
+  min-height: 2.75rem;
+  padding-inline: 0.65rem;
+  border: 1px solid var(--input);
+  border-radius: 0.5rem;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.formulario-avaliacao select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.formulario-avaliacao button {
+  min-height: 2.75rem;
+}
+
+.detalhes-painel [role='alert'] {
+  color: var(--destructive);
+}
+
+@media (max-width: 37rem) {
+  .detalhes-jogo,
+  .detalhes-notas {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .detalhes-jogo {
-    grid-template-columns: 1fr;
-  }
-
-  .detalhes-capa,
-  .detalhes-capa img {
-    min-height: 14rem;
+  .detalhes-jogo .capa-jogo {
+    width: min(42vw, 11rem);
   }
 }

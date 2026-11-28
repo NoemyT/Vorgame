@@ -1,0 +1,41 @@
+.formulario-busca {
+  width: min(100%, 34rem);
+}
+
+.busca-controles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.busca-campo {
+  position: relative;
+  min-width: 0;
+}
+
+.busca-campo > svg {
+  position: absolute;
+  top: 50%;
+  left: 0.8rem;
+  z-index: 1;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+
+.busca-controles input {
+  min-height: 3.1rem;
+  padding-left: 2.5rem;
+  background: var(--card);
+  font-size: 1rem;
+}
+
+.busca-controles button {
+  min-height: 3.1rem;
+  padding-inline: clamp(0.65rem, 2vw, 1.25rem);
+}
+
+.formulario-busca [role='alert'] {
+  margin-top: 0.45rem;
+  color: var(--destructive);
+}

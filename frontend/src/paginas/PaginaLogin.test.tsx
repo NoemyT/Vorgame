@@ -81,4 +81,17 @@ describe('PaginaLogin', () => {
     expect(screen.getByLabelText('E-mail ou nome de usuário')).toBeRequired();
     expect(screen.getByLabelText('Senha')).toBeRequired();
   });
+
+  it('mostra e oculta a senha sem submeter o formulário', async () => {
+    const login = vi.spyOn(api, 'iniciarSessao');
+    const usuario = userEvent.setup();
+    renderizarLogin();
+
+    const senha = screen.getByLabelText('Senha');
+    await usuario.click(screen.getByRole('button', { name: 'Mostrar senha' }));
+    expect(senha).toHaveAttribute('type', 'text');
+    await usuario.click(screen.getByRole('button', { name: 'Ocultar senha' }));
+    expect(senha).toHaveAttribute('type', 'password');
+    expect(login).not.toHaveBeenCalled();
+  });
 });

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Button } from '../componentes/ui/button';
 import { consultarSaude, type StatusSaude } from '../servicos/api';
 
 type EstadoConsulta =
@@ -62,19 +63,19 @@ export function PaginaStatus() {
   }
 
   return (
-    <main className="pagina">
+    <main className="limite pagina pagina-status">
       <h1>Vorgame</h1>
       <h2>Status do sistema</h2>
       <section aria-live="polite" aria-busy={estado.fase === 'carregando'}>
         <ResultadoStatus estado={estado} />
       </section>
-      <button
+      <Button
         type="button"
         onClick={verificarNovamente}
         disabled={estado.fase === 'carregando'}
       >
         Verificar novamente
-      </button>
+      </Button>
     </main>
   );
 }

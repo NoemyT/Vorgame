@@ -1,0 +1,226 @@
+.hero-catalogo {
+  position: relative;
+  isolation: isolate;
+  border-bottom: 1px solid var(--border);
+  background: #121e2d;
+}
+
+.hero-arte {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 32%;
+  overflow: hidden;
+}
+
+.hero-arte img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% center;
+}
+
+.hero-arte::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background:
+    linear-gradient(
+      90deg,
+      #121e2d 0%,
+      rgb(18 30 45 / 85%) 15%,
+      transparent 58%
+    ),
+    linear-gradient(0deg, rgb(10 15 23 / 65%), transparent 32%);
+}
+
+.hero-grade {
+  display: grid;
+  min-height: clamp(28rem, 47vw, 36rem);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: 1.5rem;
+  align-items: center;
+  padding-block: clamp(2.5rem, 6vw, 5rem);
+}
+
+.hero-texto {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-texto h1 {
+  font-size: clamp(4rem, 7.4vw, 6rem);
+  line-height: 0.93;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.hero-texto h1 span {
+  display: block;
+  color: var(--primary);
+}
+
+.hero-texto > p {
+  max-width: 42ch;
+  margin-block: 1.2rem 1.45rem;
+  color: var(--muted-foreground);
+  font-size: clamp(0.95rem, 1.68vw, 1.12rem);
+}
+
+.hero-explorar {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  color: var(--primary);
+  font-size: 0.93rem;
+  font-weight: 700;
+}
+
+.hero-explorar:is(:hover, :focus-visible) {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hero-jogo {
+  display: flex;
+  max-width: 24rem;
+  align-self: end;
+  justify-self: end;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.9rem 1.05rem;
+  border: 1px solid #54687a;
+  border-radius: var(--radius);
+  background: #162333;
+  transition:
+    background var(--movimento-curto) ease-out,
+    border-color var(--movimento-curto) ease-out;
+}
+
+.hero-jogo::before {
+  position: absolute;
+  inset: 0 0 0 48%;
+  content: '';
+}
+
+.hero-jogo:hover,
+.hero-jogo:focus-visible {
+  border-color: var(--primary);
+  background: var(--secondary);
+}
+
+.hero-jogo-titulo {
+  font: 700 clamp(1.65rem, 3vw, 2.3rem)/1 var(--fonte-titulo);
+}
+
+.hero-jogo p {
+  margin-top: 0.35rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.hero-jogo-icone {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
+  place-items: center;
+  border: 1px solid #54687a;
+  border-radius: 50%;
+  color: var(--primary);
+  transition:
+    background var(--movimento-curto) ease-out,
+    color var(--movimento-curto) ease-out;
+}
+
+.hero-jogo:is(:hover, :focus-visible) .hero-jogo-icone {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+@keyframes revelar-night-city {
+  from {
+    transform: scale(1.045);
+    clip-path: inset(0 0 0 4%);
+    opacity: 0.78;
+  }
+
+  to {
+    transform: scale(1);
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-arte img {
+    animation: revelar-night-city var(--movimento-cena) var(--movimento-saida);
+  }
+
+  .hero-explorar svg {
+    transition: transform var(--movimento-medio) var(--movimento-saida);
+  }
+
+  .hero-explorar:is(:hover, :focus-visible) svg {
+    transform: translateY(0.18rem);
+  }
+}
+
+@media (max-width: 56rem) {
+  .hero-grade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.65fr);
+  }
+
+  .hero-texto h1 {
+    font-size: clamp(3.7rem, 8.5vw, 5.1rem);
+  }
+}
+
+@media (max-width: 44rem) {
+  .hero-arte {
+    inset: 0;
+  }
+
+  .hero-arte img {
+    object-position: 64% center;
+  }
+
+  .hero-arte::after {
+    background:
+      linear-gradient(
+        90deg,
+        rgb(14 20 30 / 94%),
+        rgb(14 20 30 / 60%) 55%,
+        rgb(14 20 30 / 25%)
+      ),
+      linear-gradient(0deg, #121e2d, transparent 48%);
+  }
+
+  .hero-grade {
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.9rem;
+    padding-block: clamp(1.75rem, 7vw, 3rem) 1.4rem;
+  }
+
+  .hero-texto h1 {
+    font-size: clamp(2.9rem, 10.8vw, 4.2rem);
+  }
+
+  .hero-texto > p {
+    margin-block: 0.8rem 1.05rem;
+    color: var(--foreground);
+  }
+
+  .hero-jogo {
+    width: min(100%, 25rem);
+    justify-self: start;
+    justify-content: space-between;
+  }
+
+  .hero-jogo::before {
+    inset: auto 0 0;
+    height: 31%;
+  }
+}

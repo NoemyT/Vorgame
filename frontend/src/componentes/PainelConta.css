@@ -1,0 +1,118 @@
+.pagina.pagina-conta {
+  display: grid;
+  max-width: 69rem;
+  grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.02fr);
+  gap: 1rem;
+}
+
+.conta-painel[data-slot='card'] {
+  gap: 0;
+  padding: clamp(1rem, 4vw, 2.25rem);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.conta-painel h1 {
+  font-size: clamp(2.75rem, 6vw, 4.25rem);
+}
+
+.conta-introducao {
+  margin-top: 0.55rem;
+  color: var(--muted-foreground);
+}
+
+.conta-form,
+.conta-feedback {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.conta-form > button {
+  min-height: 2.9rem;
+}
+
+.conta-feedback {
+  align-items: start;
+}
+
+.conta-feedback h2 {
+  font-size: 1.85rem;
+}
+
+.conta-feedback a {
+  justify-self: start;
+}
+
+.conta-campo {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.conta-campo label {
+  font-size: 0.93rem;
+  font-weight: 650;
+}
+
+.conta-campo input {
+  min-height: 2.9rem;
+  background: var(--background);
+  font-size: 1rem;
+}
+
+.campo-senha {
+  position: relative;
+}
+
+.campo-senha input {
+  padding-right: 3.35rem;
+}
+
+.campo-senha .senha-acao {
+  position: absolute;
+  inset: 0.125rem 0.2rem 0.125rem auto;
+  width: 2.65rem;
+  height: auto;
+  color: var(--muted-foreground);
+}
+
+.conta-alternativa {
+  color: var(--muted-foreground);
+  font-size: 0.92rem;
+}
+
+.conta-arte {
+  position: relative;
+  min-height: 24rem;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--secondary);
+}
+
+.conta-arte img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.conta-arte figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 1.6rem 1.15rem 0.8rem;
+  background: linear-gradient(0deg, #0e141e, transparent);
+  font: 700 1.5rem/1.1 var(--fonte-titulo);
+}
+
+@media (max-width: 44rem) {
+  .pagina.pagina-conta {
+    grid-template-columns: minmax(0, 1fr);
+    padding-block: 1.5rem 2.5rem;
+  }
+
+  .conta-arte {
+    min-height: 0;
+    aspect-ratio: 2 / 1;
+  }
+}
