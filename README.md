@@ -29,29 +29,32 @@ Monólito modular em camadas (apresentação HTTP → aplicação/domínio → p
 
 Definida no [ADR-002](docs/2.%20ADR.md).
 
-| Parte        | Tecnologias                                                                                                            |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Backend      | Node.js, TypeScript, NestJS (adaptador Express), validação com DTOs e `class-validator`, OpenAPI com `@nestjs/swagger` |
-| Persistência | MySQL (InnoDB), Prisma ORM e Prisma Migrate                                                                            |
-| Frontend     | React, TypeScript, Vite, React Router, CSS, Tailwind CSS, Radix UI, Lucide React, `fetch`                                                                    |
-| Catálogo externo | IGDB v4 com OAuth da Twitch no backend |
-| Testes       | Vitest e Supertest no backend; Vitest e React Testing Library no frontend                                              |
+| Parte            | Tecnologias                                                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Backend          | Node.js, TypeScript, NestJS (adaptador Express), validação com DTOs e `class-validator`, OpenAPI com `@nestjs/swagger` |
+| Persistência     | TiDB Cloud (compatível com MySQL), Prisma ORM e Prisma Migrate                                                         |
+| Frontend         | React, TypeScript, Vite, React Router, CSS, Tailwind CSS, Radix UI, Lucide React, `fetch`                              |
+| Catálogo externo | IGDB v4 com OAuth da Twitch no backend                                                                                 |
+| Testes           | Vitest e Supertest no backend; Vitest e React Testing Library no frontend                                              |
 
 Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/README.md](frontend/README.md).
 
 ## Documentação (`/docs`)
 
-| Arquivo                                                                                        | Conteúdo                                                   |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| [1. Histórias de Usuário (Alta)](docs/1.%20Hist%C3%B3rias%20de%20Usu%C3%A1rio%20%28Alta%29.md) | HU01 a HU06, recorte do protótipo e critérios de aceitação |
-| [2. ADR](docs/2.%20ADR.md)                                                                     | Arquitetura, stack e decisão sobre a IGDB |
-| [3. Diagrama de Contexto](docs/3.%20Diagrama%20de%20Contexto.png)                              | C4 nível 1 com usuário, Vorgame e IGDB |
-| [4. Diagrama de Container](docs/4.%20Diagrama%20de%20Container.png)                            | C4 nível 2 com aplicação web, backend, banco e serviços externos |
-| [5. Diagrama de Componentes](docs/5.%20Diagrama%20de%20Componentes.png)                        | C4 nível 3 com módulos do backend e adaptador IGDB |
-| [6. Diagrama de Código](docs/6.%20Diagrama%20de%20C%C3%B3digo.png)                             | C4 nível 4: classes Usuário, Jogo, Avaliação e Review      |
-| [7. Contrato da API](docs/7.%20Contrato%20da%20API.md)                                         | Endpoints do protótipo com entrada, saída e erros          |
-| [8. Modelo de Dados e Seed](docs/8.%20Modelo%20de%20Dados%20e%20Seed.md)                       | Persistência, carga fictícia e validação |
-| [9. Diagrama Entidade-Relacionamento](docs/9.%20Diagrama%20Entidade-Relacionamento.svg)         | Chaves locais e unicidade da identidade externa |
+| Arquivo                                                                                         | Conteúdo                                                         |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [1. Histórias de Usuário (Alta)](docs/1.%20Hist%C3%B3rias%20de%20Usu%C3%A1rio%20%28Alta%29.md)  | HU01 a HU06, recorte do protótipo e critérios de aceitação       |
+| [2. ADR](docs/2.%20ADR.md)                                                                      | Arquitetura, stack e decisão sobre a IGDB                        |
+| [3. Diagrama de Contexto](docs/3.%20Diagrama%20de%20Contexto.png)                               | C4 nível 1 com usuário, Vorgame e IGDB                           |
+| [4. Diagrama de Container](docs/4.%20Diagrama%20de%20Container.png)                             | C4 nível 2 com aplicação web, backend, banco e serviços externos |
+| [5. Diagrama de Componentes](docs/5.%20Diagrama%20de%20Componentes.png)                         | C4 nível 3 com módulos do backend e adaptador IGDB               |
+| [6. Diagrama de Código](docs/6.%20Diagrama%20de%20C%C3%B3digo.png)                              | C4 nível 4: classes Usuário, Jogo, Avaliação e Review            |
+| [7. Contrato da API](docs/7.%20Contrato%20da%20API.md)                                          | Endpoints do protótipo com entrada, saída e erros                |
+| [8. Modelo de Dados e Seed](docs/8.%20Modelo%20de%20Dados%20e%20Seed.md)                        | Persistência, carga fictícia e validação                         |
+| [9. Diagrama Entidade-Relacionamento](docs/9.%20Diagrama%20Entidade-Relacionamento.svg)         | Chaves locais e unicidade da identidade externa                  |
+| [10. Relatório de Testes](docs/10.%20Relat%C3%B3rio%20de%20Testes.md)                           | Resultados dos testes automatizados e aceite manual              |
+| [11. Registro de Uso de IA](docs/11.%20Registro%20de%20Uso%20de%20IA.md)                        | Interações com IA, resultados, verificações e ajustes manuais    |
+| [12. Retrospectiva Sobre o Uso de IA](docs/12.%20Retrospectiva%20Sobre%20o%20Uso%20de%20IA.pdf) | Análise crítica do processo de desenvolvimento com IA            |
 
 ## Estrutura do repositório
 
@@ -73,7 +76,7 @@ Detalhes de cada parte em [backend/README.md](backend/README.md) e [frontend/REA
 
 O código final do protótipo implementa as HU01 a HU05, incluindo criação e alteração de notas pela interface web, atualização da média e do total de avaliações e consulta das avaliações da própria conta. A página inicial apresenta uma seleção de jogos, e o rodapé inclui a atribuição à IGDB e o acesso aos créditos das imagens. A HU06 permanece fora do escopo.
 
-A busca de Terraria na IGDB, os detalhes e o fluxo de avaliação via API foram validados com um banco local isolado em 27/11/2026. Para publicar a versão final, o ambiente deve estar com as migrations aplicadas e as credenciais da IGDB configuradas no Render.
+A busca de Terraria na IGDB, os detalhes e o fluxo de avaliação via API foram validados com um banco local isolado em 27/11/2026. As migrations e o seed foram aplicados no TiDB Cloud. Os fluxos principais do protótipo publicado foram validados pelo grupo, com 195 testes automatizados e 24 verificações manuais aprovados. Os resultados e as limitações estão documentados no relatório de testes.
 
 - [Frontend hospedado na Vercel](https://vorgame.vercel.app)
 - [Rota de saúde da API hospedada no Render](https://vorgame-api.onrender.com/health)

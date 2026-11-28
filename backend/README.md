@@ -2,17 +2,17 @@
 
 ## Stack escolhida
 
-| Responsabilidade      | Tecnologia                                                               |
-| --------------------- | ------------------------------------------------------------------------ |
-| Linguagem             | TypeScript                                                               |
-| Ambiente de execução  | Node.js 22 LTS, com npm                                                  |
-| API REST              | NestJS 12 com adaptador Express                                          |
-| Validação de entradas | DTOs com `ValidationPipe`, `class-validator` e `class-transformer`       |
-| Persistência          | Prisma ORM 6 e Prisma Client                                             |
-| Banco de dados        | MySQL com tabelas InnoDB, hospedado no TiDB Cloud (compatível com MySQL) |
-| Migrações do banco    | Prisma Migrate                                                           |
-| Documentação OpenAPI  | `@nestjs/swagger`                                                        |
-| Testes                | Vitest e Supertest                                                       |
+| Responsabilidade      | Tecnologia                                                         |
+| --------------------- | ------------------------------------------------------------------ |
+| Linguagem             | TypeScript                                                         |
+| Ambiente de execução  | Node.js 22 LTS, com npm                                            |
+| API REST              | NestJS 12 com adaptador Express                                    |
+| Validação de entradas | DTOs com `ValidationPipe`, `class-validator` e `class-transformer` |
+| Persistência          | Prisma ORM 6 e Prisma Client                                       |
+| Banco de dados        | TiDB Cloud (compatível com MySQL)                                  |
+| Migrações do banco    | Prisma Migrate                                                     |
+| Documentação OpenAPI  | `@nestjs/swagger`                                                  |
+| Testes                | Vitest e Supertest                                                 |
 
 NestJS organiza a API em módulos, controllers e providers, alinhados ao monólito modular previsto. TypeScript é usado tanto no backend quanto no frontend. Prisma organiza o acesso tipado ao banco e a evolução do esquema por migrações; `@nestjs/swagger` permite documentar e conferir a implementação com o [contrato da API](../docs/7.%20Contrato%20da%20API.md).
 
